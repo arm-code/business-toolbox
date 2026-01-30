@@ -3,9 +3,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 export const metadata = {
-  title: "Business Tools",
+  title: "Business Toolbox | arm-solutions",
   description: "Simple business tools for invoicing, quotes, and expenses.",
   manifest: "/manifest.json",
+  themeColor: "#7c3aed",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
 };
 
 const geistSans = Geist({

@@ -107,7 +107,7 @@ export default function SaleNote() {
                             type="text"
                             placeholder="Nombre del cliente o nota adicional..."
                             value={client}
-                            onChange={(e) => setClient(e.target.value)}
+                            onChange={(e) => setClient(e.target.value.toUpperCase())}
                             className="w-full bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground/50 font-medium"
                         />
                     </div>
@@ -124,7 +124,7 @@ export default function SaleNote() {
                                 <div key={item.id} className="p-4 border rounded-xl bg-card shadow-sm hover:border-primary/30 transition-all space-y-3 relative group">
                                     <div className="flex justify-between items-start">
                                         <div className="flex-1">
-                                            <p className="text-sm font-bold truncate">{item.description || "Sin descripción"}</p>
+                                            <p className="text-sm font-bold overflow-clip truncate max-w-[150px] text-ellipsis">{item.description.toUpperCase() || "Sin descripción"}</p>
                                             <p className="text-xs text-muted-foreground">{item.quantity} x ${item.price.toFixed(2)}</p>
                                         </div>
                                         <div className="text-right">

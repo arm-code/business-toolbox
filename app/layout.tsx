@@ -6,8 +6,14 @@ export const metadata = {
   title: "Business Toolbox | arm-solutions",
   description: "Simple business tools for invoicing, quotes, and expenses.",
   manifest: "/manifest.json",
+};
+
+export const viewport = {
   themeColor: "#7c3aed",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 const geistSans = Geist({

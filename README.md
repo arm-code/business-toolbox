@@ -1,16 +1,54 @@
+# Business Toolbox by arm-solutions
+
+A minimalist toolbox for business management, designed to be fast, responsive, and mobile-friendly (PWA).
+
 #### About Author
 - Ing. Alexis Romero Mendoza
 - Date started: 2026-01-29
 
-#### About the project
-- this project consist in a toolbox for business management
+#### Project Vision
+Inspired by ILovePDF, this project is divided into micro-tools according to business needs (Sales, Quotes, Notes, etc.). It aims to provide a "single-purpose tool" experience for small businesses.
 
 #### Getting Started
-
-First, run the development server:
-- clone repository
-- run `npm install`
-- run `npm run dev`
-
+1. Clone repository
+2. Run `npm install`
+3. Run `npm run dev`
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+---
+
+### 🎨 Styling Guidelines
+To maintain the minimalist and premium look of **arm-solutions**, follow these rules:
+
+1. **Colors**: Use the predefined shadcn violet palette. Refer to variable colors like `var(--primary)`, `var(--accent)`, and `var(--muted)`.
+2. **Typography**: Use the Geist font family provided.
+3. **PWA First**: Layouts must be mobile-first and responsive. Ensure that tools are usable on small screens.
+4. **Minimalism**: Focus on whitespace, clean lines, and clear typography. Avoid clutter.
+5. **Interactive**: Use subtle micro-animations and hover effects to make the app feel alive.
+
+---
+
+### 📂 Folders Structure
+Follow this organization for new features:
+
+- **Lo específico vive dentro de la herramienta** (`app/tools/[tool-name]`)
+- **Lo reutilizable vive en carpetas globales** (`components/`, `lib/`, `types/`)
+
+```text
+app/
+├── layout.tsx
+├── page.tsx               # Landing Page
+├── catalog/
+│   └── page.tsx           # Services Catalog (ILovePDF style)
+└── tools/
+    └── sale-note/         # Tool-specific logic
+        ├── page.tsx
+        ├── components/
+        └── services/
+
+components/
+├── ui/                    # shadcn components
+├── layout/                # Navbar, Footer
+└── shared/                # Global components (Logo, etc.)
+```

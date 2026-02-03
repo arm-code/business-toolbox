@@ -118,15 +118,31 @@ export default function POSPage() {
     };
 
     const addToCart = (product: Product) => {
+        if (product.stock <= 0) {
+            showToast(`El producto ${product.name} no tiene existencias`, 'info');
+            return;
+        }
+
         const existing = cart.find(item => item.product.id === product.id);
         if (existing) {
+            const increment = product.unit === 'PESO' ? 0.1 : 1;
+            if (existing.quantity + increment > product.stock) {
+                showToast(`No hay suficiente stock para agregar más ${product.name}`, 'info');
+                return;
+            }
+
             setCart(cart.map(item =>
                 item.product.id === product.id
-                    ? { ...item, quantity: item.quantity + (product.unit === 'PESO' ? 0.1 : 1) }
+                    ? { ...item, quantity: Number((item.quantity + increment).toFixed(2)) }
                     : item
             ));
         } else {
-            setCart([...cart, { product, quantity: product.unit === 'PESO' ? 0.5 : 1 }]);
+            const initialQty = product.unit === 'PESO' ? 0.5 : 1;
+            if (initialQty > product.stock) {
+                showToast(`No hay suficiente stock para agregar ${product.name}`, 'info');
+                return;
+            }
+            setCart([...cart, { product, quantity: initialQty }]);
         }
     };
 
@@ -138,6 +154,10 @@ export default function POSPage() {
         setCart(cart.map(item => {
             if (item.product.id === productId) {
                 const newQty = Math.max(0.1, item.quantity + delta);
+                if (newQty > item.product.stock) {
+                    showToast(`Solo hay ${item.product.stock} disponibles`, 'info');
+                    return { ...item, quantity: item.product.stock };
+                }
                 return { ...item, quantity: Number(newQty.toFixed(2)) };
             }
             return item;
@@ -260,17 +280,24 @@ export default function POSPage() {
                                 <button
                                     key={product.id}
                                     onClick={() => addToCart(product)}
-                                    className="flex flex-col text-left bg-card border rounded-2xl p-4 hover:shadow-md hover:border-primary/30 transition-all group"
+                                    disabled={product.stock <= 0}
+                                    className={`flex flex-col text-left bg-card border rounded-2xl p-4 hover:shadow-md transition-all group ${product.stock <= 0 ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:border-primary/30'}`}
                                 >
                                     <div className="flex justify-between items-start mb-2">
-                                        <div className="p-2 bg-violet-100 rounded-xl">
-                                            <Package className="h-5 w-5 text-violet-700" />
+                                        <div className={`p-2 rounded-xl ${product.stock <= 0 ? 'bg-muted' : 'bg-violet-100'}`}>
+                                            <Package className={`h-5 w-5 ${product.stock <= 0 ? 'text-muted-foreground' : 'text-violet-700'}`} />
                                         </div>
                                         <div className="text-right">
                                             <span className="text-xs font-bold text-muted-foreground block uppercase">{product.unit}</span>
-                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${product.stock > 10 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                                STK: {product.stock}
-                                            </span>
+                                            {product.stock <= 0 ? (
+                                                <span className="text-[10px] font-black bg-red-600 text-white px-1.5 py-0.5 rounded-full ring-2 ring-red-100">
+                                                    SIN STOCK
+                                                </span>
+                                            ) : (
+                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${product.stock > 10 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                    STK: {product.stock}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                     <h3 className="text-sm font-bold truncate group-hover:text-primary transition-colors">{product.name.toUpperCase()}</h3>

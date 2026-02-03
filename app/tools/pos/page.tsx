@@ -17,11 +17,13 @@ import {
     Plus,
     Minus,
     Loader2,
-    BarChart3
+    BarChart3,
+    Printer
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
-import { Product, Customer, PaymentMethod, CreateSaleDto } from "../../types/pos";
+import { Product, Customer, PaymentMethod, CreateSaleDto, SaleHistoryItem } from "../../types/pos";
 import Toast, { ToastType } from "../../components/Toast";
+import Ticket from "../../components/Ticket";
 
 export default function POSPage() {
     const [search, setSearch] = useState("");
@@ -35,6 +37,7 @@ export default function POSPage() {
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
     const [processing, setProcessing] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [lastSale, setLastSale] = useState<SaleHistoryItem | null>(null);
     const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
 
     const showToast = (message: string, type: ToastType = 'success') => {
@@ -167,18 +170,19 @@ export default function POSPage() {
                 }))
             };
 
-            await apiFetch("/sales", {
+            const response = await apiFetch<SaleHistoryItem>("/sales", {
                 method: 'POST',
                 body: JSON.stringify(saleData)
             });
 
+            setLastSale(response);
             setSuccess(true);
             setCart([]);
             setSelectedCustomer(null);
             showToast("Venta realizada con éxito");
             setTimeout(() => {
-                setSuccess(false);
-                setIsCheckoutOpen(false);
+                // We don't auto-close the modal immediately to allow printing
+                // But we can reset success state if needed, let's keep it for now
                 fetchProducts(); // Refresh stock
                 fetchCustomers(); // Refresh balances
             }, 2000);
@@ -187,6 +191,10 @@ export default function POSPage() {
         } finally {
             setProcessing(false);
         }
+    };
+
+    const handlePrint = () => {
+        window.print();
     };
 
 
@@ -360,7 +368,27 @@ export default function POSPage() {
                                     <CheckCircle2 className="h-10 w-10 text-green-600" />
                                 </div>
                                 <h3 className="text-2xl font-black tracking-tighter uppercase mb-2">¡Venta Exitosa!</h3>
-                                <p className="text-muted-foreground">La transacción se ha registrado correctamente.</p>
+                                <p className="text-muted-foreground mb-8">La transacción se ha registrado correctamente.</p>
+
+                                <div className="flex flex-col gap-3 w-full">
+                                    <button
+                                        onClick={handlePrint}
+                                        className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <Printer className="h-5 w-5" />
+                                        Imprimir Ticket
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setIsCheckoutOpen(false);
+                                            setSuccess(false);
+                                            setLastSale(null);
+                                        }}
+                                        className="w-full py-4 bg-muted text-muted-foreground rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-muted/80 active:scale-95 transition-all"
+                                    >
+                                        Cerrar
+                                    </button>
+                                </div>
                             </div>
                         ) : (
                             <>
@@ -457,6 +485,11 @@ export default function POSPage() {
                     onClose={() => setToast(null)}
                 />
             )}
+
+            {/* Hidden Ticket for Printing */}
+            <div className="hidden print:block">
+                <Ticket sale={lastSale} />
+            </div>
         </div>
     );
 }

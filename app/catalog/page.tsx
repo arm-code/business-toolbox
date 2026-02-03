@@ -12,6 +12,15 @@ const tools = [
         href: "/tools/sale-note",
     },
     {
+        id: "pos",
+        name: "Punto de Venta (POS)",
+        description: "Gestiona tu inventario y realiza ventas en tiempo real conectadas a tu sistema.",
+        icon: CreditCard,
+        color: "text-violet-700",
+        bg: "bg-violet-100",
+        href: "/tools/pos",
+    },
+    {
         id: "invoice-draft",
         name: "Borrador de Factura",
         description: "Prepara los datos para tus facturas antes de emitirlas oficialmente.",

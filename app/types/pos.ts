@@ -49,14 +49,31 @@ export interface SaleDetail extends CreateSaleDto {
 }
 
 export interface CashClosingReport {
+    date: string;
     totalSales: number;
-    cashSales: number;
-    cardSales: number;
-    creditSales: number;
+    totalIncome: number;
+    details: {
+        [key: string]: number;
+    };
 }
 
 export interface NetProfitReport {
-    totalRevenue: number;
-    totalCost: number;
+    revenue: number;
+    cost: number;
     netProfit: number;
+}
+
+export interface SaleHistoryItem {
+    id: string;
+    createdAt: string;
+    total: number | string;
+    paymentMethod: PaymentMethod;
+    customer?: Customer | null;
+    items: {
+        id: string;
+        quantity: number | string;
+        price: number | string;
+        subtotal: number | string;
+        product: Product;
+    }[];
 }

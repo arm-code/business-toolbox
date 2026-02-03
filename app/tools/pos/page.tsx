@@ -255,7 +255,7 @@ export default function POSPage() {
                                     </button>
                                 </div>
                                 <div className="w-16 text-right font-black text-xs text-primary">
-                                    ${(item.product.sellPrice * item.quantity).toFixed(2)}
+                                    ${(Number(item.product.sellPrice) * item.quantity).toFixed(2)}
                                 </div>
                                 <button
                                     onClick={() => removeFromCart(item.product.id)}
@@ -357,7 +357,7 @@ export default function POSPage() {
                                                 >
                                                     <option value="">-- Seleccionar --</option>
                                                     {customers.map(c => (
-                                                        <option key={c.id} value={c.id}>{c.name.toUpperCase()} (Deuda: ${c.balance.toFixed(2)})</option>
+                                                        <option key={c.id} value={c.id}>{c.name.toUpperCase()} (Deuda: ${Number(c.balance).toFixed(2)})</option>
                                                     ))}
                                                 </select>
                                             </div>

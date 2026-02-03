@@ -59,7 +59,8 @@ export default function POSPage() {
     const fetchProducts = async (query = "") => {
         try {
             setLoading(true);
-            const data = await apiFetch<Product[]>(`/inventory/products${query ? `?search=${query}` : ""}`);
+            const encodedQuery = encodeURIComponent(query.toUpperCase().trim());
+            const data = await apiFetch<Product[]>(`/inventory/products${query ? `?search=${encodedQuery}` : ""}`);
             setProducts(data);
         } catch (error) {
             console.error("Error fetching products:", error);
@@ -177,8 +178,8 @@ export default function POSPage() {
                             type="text"
                             placeholder="Buscar por nombre o código..."
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full bg-muted border-none rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                            onChange={(e) => setSearch(e.target.value.toUpperCase())}
+                            className="w-full bg-muted border-none rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none uppercase"
                         />
                     </div>
                     <div className="ml-4 flex items-center gap-1 shrink-0">

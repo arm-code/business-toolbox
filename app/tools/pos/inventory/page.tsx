@@ -62,9 +62,9 @@ export default function InventoryPage() {
 
             // Clean payload to ensure correct types
             const payload = {
-                name: editingProduct.name,
-                description: editingProduct.description || "",
-                barcode: editingProduct.barcode,
+                name: (editingProduct.name || "").toUpperCase(),
+                description: (editingProduct.description || "").toUpperCase(),
+                barcode: (editingProduct.barcode || "").toUpperCase(),
                 purchasePrice: Number(editingProduct.purchasePrice),
                 sellPrice: Number(editingProduct.sellPrice),
                 stock: Number(editingProduct.stock),
@@ -94,8 +94,8 @@ export default function InventoryPage() {
             const endpoint = editingCategory?.id ? `/inventory/categories/${editingCategory.id}` : '/inventory/categories';
 
             const payload = {
-                name: editingCategory.name,
-                description: editingCategory.description || ""
+                name: (editingCategory.name || "").toUpperCase(),
+                description: (editingCategory.description || "").toUpperCase()
             };
 
             await apiFetch(endpoint, {
@@ -387,16 +387,16 @@ export default function InventoryPage() {
                                             required
                                             type="text"
                                             value={editingCategory?.name || ''}
-                                            onChange={e => setEditingCategory({ ...editingCategory, name: e.target.value })}
-                                            className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
+                                            onChange={e => setEditingCategory({ ...editingCategory, name: e.target.value.toUpperCase() })}
+                                            className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold uppercase outline-none"
                                         />
                                     </div>
                                     <div>
                                         <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Descripción</label>
                                         <textarea
                                             value={editingCategory?.description || ''}
-                                            onChange={e => setEditingCategory({ ...editingCategory, description: e.target.value })}
-                                            className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none h-24 resize-none"
+                                            onChange={e => setEditingCategory({ ...editingCategory, description: e.target.value.toUpperCase() })}
+                                            className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold uppercase outline-none h-24 resize-none"
                                         />
                                     </div>
                                     <button

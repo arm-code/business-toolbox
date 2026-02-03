@@ -17,7 +17,7 @@ import {
     Package,
     CheckCircle2,
     X,
-    Plus
+    Eye
 } from "lucide-react";
 import { apiFetch } from "../../../lib/api";
 import { CashClosingReport, NetProfitReport, SaleHistoryItem } from "../../../types/pos";
@@ -209,7 +209,7 @@ export default function ReportsPage() {
                                             <div className="text-right flex items-center gap-3">
                                                 <p className="text-xl font-black text-primary tracking-tighter">${Number(sale.total).toFixed(2)}</p>
                                                 <div className="hidden group-hover:block p-2 bg-primary text-white rounded-full transition-all">
-                                                    <Plus className="h-4 w-4" />
+                                                    <Eye className="h-4 w-4" />
                                                 </div>
                                             </div>
                                         </button>

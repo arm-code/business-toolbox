@@ -52,3 +52,14 @@ components/
 ├── layout/                # Navbar, Footer
 └── shared/                # Global components (Logo, etc.)
 ```
+
+#### How to enable "Automatic" (Silent) Printing
+Browsers normally show a confirmation dialog before printing. To bypass this and achieve truly automatic printing:
+
+Chrome / Edge / Opera (Windows):
+Close all browser windows.
+Right-click your browser shortcut on the desktop.
+Select Properties.
+In the Target field, add a space at the end and then: --kiosk-printing
+Click OK and open the browser from that shortcut.
+Result: Now, when you click "Imprimir Ticket" in the POS, it will print immediately without showing the dialog.

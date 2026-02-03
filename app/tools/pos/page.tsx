@@ -48,6 +48,30 @@ export default function POSPage() {
         fetchPaymentMethods();
     }, []);
 
+    // Keyboard Shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'F2') {
+                e.preventDefault();
+                const searchInput = document.getElementById('product-search');
+                if (searchInput) searchInput.focus();
+            }
+            if (e.key === 'F4') {
+                e.preventDefault();
+                if (cart.length > 0) setIsCheckoutOpen(true);
+            }
+            if (e.key === 'Escape') {
+                setIsCheckoutOpen(false);
+            }
+            if (e.key === 'Enter' && !processing && !success) {
+                if (isCheckoutOpen) handleCheckout();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [cart, isCheckoutOpen, processing, success]);
+
     // Search logic with debounce
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -156,6 +180,7 @@ export default function POSPage() {
                 setSuccess(false);
                 setIsCheckoutOpen(false);
                 fetchProducts(); // Refresh stock
+                fetchCustomers(); // Refresh balances
             }, 2000);
         } catch (error: any) {
             showToast(error.message || "Error al procesar la venta", 'error');
@@ -163,6 +188,7 @@ export default function POSPage() {
             setProcessing(false);
         }
     };
+
 
     return (
         <div className="min-h-screen bg-background flex flex-col md:flex-row overflow-hidden">
@@ -176,13 +202,21 @@ export default function POSPage() {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <input
                             type="text"
-                            placeholder="Buscar por nombre o código..."
+                            id="product-search"
+                            placeholder="Buscar [F2]..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value.toUpperCase())}
                             className="w-full bg-muted border-none rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none uppercase"
                         />
                     </div>
                     <div className="ml-4 flex items-center gap-1 shrink-0">
+                        <NextLink
+                            href="/tools/pos/customers"
+                            className="p-2.5 bg-muted rounded-xl hover:bg-primary/10 hover:text-primary transition-all flex items-center gap-2"
+                            title="Clientes"
+                        >
+                            <User className="h-5 w-5" />
+                        </NextLink>
                         <NextLink
                             href="/tools/pos/inventory"
                             className="p-2.5 bg-muted rounded-xl hover:bg-primary/10 hover:text-primary transition-all flex items-center gap-2"
@@ -309,9 +343,9 @@ export default function POSPage() {
                     <button
                         disabled={cart.length === 0}
                         onClick={() => setIsCheckoutOpen(true)}
-                        className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-primary/20 hover:opacity-90 disabled:opacity-30 active:scale-[0.98] transition-all"
+                        className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-primary/20 hover:opacity-90 disabled:opacity-30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                     >
-                        Cobrar Ahora
+                        Cobrar Ahora <span className="opacity-50">[F4]</span>
                     </button>
                 </div>
             </div>
@@ -415,6 +449,7 @@ export default function POSPage() {
                     </div>
                 </div>
             )}
+
             {toast && (
                 <Toast
                     message={toast.message}

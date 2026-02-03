@@ -13,7 +13,8 @@ import {
     Search,
     Loader2,
     X,
-    FolderPlus
+    FolderPlus,
+    PackagePlus
 } from "lucide-react";
 import { apiFetch } from "../../../lib/api";
 import { Product, Category } from "../../../types/pos";
@@ -28,6 +29,9 @@ export default function InventoryPage() {
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Partial<Product>>({});
     const [editingCategory, setEditingCategory] = useState<Partial<Category>>({});
+    const [isAddStockModalOpen, setIsAddStockModalOpen] = useState(false);
+    const [selectedProductForStock, setSelectedProductForStock] = useState<Product | null>(null);
+    const [stockAmountToAdd, setStockAmountToAdd] = useState<number>(0);
     const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
 
     const showToast = (message: string, type: ToastType = 'success') => {
@@ -69,7 +73,7 @@ export default function InventoryPage() {
                 sellPrice: Number(editingProduct.sellPrice),
                 stock: Number(editingProduct.stock),
                 minStock: Number(editingProduct.minStock || 0),
-                unit: editingProduct.unit,
+                unit: editingProduct.unit || 'UNIDAD',
                 categoryId: editingProduct.categoryId
             };
 
@@ -82,6 +86,26 @@ export default function InventoryPage() {
             setEditingProduct({});
             fetchData();
             showToast(editingProduct.id ? "Producto actualizado" : "Producto creado correctamente");
+        } catch (error: any) {
+            showToast(error.message, 'error');
+        }
+    };
+
+    const handleAddStock = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedProductForStock) return;
+
+        try {
+            await apiFetch(`/inventory/products/${selectedProductForStock.id}/add-stock`, {
+                method: 'PATCH',
+                body: JSON.stringify({ amount: Number(stockAmountToAdd) })
+            });
+
+            setIsAddStockModalOpen(false);
+            setSelectedProductForStock(null);
+            setStockAmountToAdd(0);
+            fetchData();
+            showToast("Stock actualizado correctamente");
         } catch (error: any) {
             showToast(error.message, 'error');
         }
@@ -219,14 +243,22 @@ export default function InventoryPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="flex justify-end gap-2">
+                                                <button
+                                                    onClick={() => { setSelectedProductForStock(p); setIsAddStockModalOpen(true); }}
+                                                    className="p-2 hover:bg-green-100 rounded-lg text-green-700 transition-colors"
+                                                    title="Agregar Stock"
+                                                >
+                                                    <PackagePlus className="h-4 w-4" />
+                                                </button>
                                                 <button
                                                     onClick={() => { setEditingProduct(p); setIsProductModalOpen(true); }}
                                                     className="p-2 hover:bg-primary/10 rounded-lg text-primary transition-colors"
+                                                    title="Editar"
                                                 >
                                                     <Edit2 className="h-4 w-4" />
                                                 </button>
-                                                <button className="p-2 hover:bg-destructive/10 rounded-lg text-destructive transition-colors">
+                                                <button className="p-2 hover:bg-destructive/10 rounded-lg text-destructive transition-colors" title="Eliminar">
                                                     <Trash2 className="h-4 w-4" />
                                                 </button>
                                             </div>
@@ -365,7 +397,49 @@ export default function InventoryPage() {
                     </div>
                 </div>
             )}
-            {/* Category Modal */}
+            {/* Add Stock Modal */}
+            {isAddStockModalOpen && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[110] backdrop-blur-sm">
+                    <div className="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl p-8 animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-black uppercase tracking-tighter text-primary">Agregar Existencia</h2>
+                            <button onClick={() => { setIsAddStockModalOpen(false); setSelectedProductForStock(null); }} className="p-2 hover:bg-muted rounded-full">
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        <div className="mb-6 p-4 bg-muted/30 rounded-2xl">
+                            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-1">Producto</p>
+                            <p className="font-black text-sm uppercase">{selectedProductForStock?.name}</p>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase mt-1">Stock Actual: {selectedProductForStock?.stock} {selectedProductForStock?.unit}</p>
+                        </div>
+
+                        <form onSubmit={handleAddStock} className="space-y-4">
+                            <div>
+                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Cantidad a Ingresar</label>
+                                <input
+                                    required
+                                    autoFocus
+                                    type="number"
+                                    step="0.01"
+                                    value={stockAmountToAdd || ''}
+                                    onChange={e => setStockAmountToAdd(parseFloat(e.target.value))}
+                                    placeholder="Ej: 50"
+                                    className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-4 text-2xl font-black text-center outline-none"
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-primary/20 mt-4 active:scale-95 transition-all"
+                            >
+                                Confirmar Ingreso
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {isCategoryModalOpen && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[100] backdrop-blur-sm">
                     <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl p-8 animate-in zoom-in-95 duration-200">

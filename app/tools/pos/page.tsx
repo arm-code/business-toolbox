@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
 import { Product, Customer, PaymentMethod, CreateSaleDto } from "../../types/pos";
+import Toast, { ToastType } from "../../components/Toast";
 
 export default function POSPage() {
     const [search, setSearch] = useState("");
@@ -34,6 +35,11 @@ export default function POSPage() {
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
     const [processing, setProcessing] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
+
+    const showToast = (message: string, type: ToastType = 'success') => {
+        setToast({ message, type });
+    };
 
     // Load initial data
     useEffect(() => {
@@ -116,12 +122,12 @@ export default function POSPage() {
 
     const handleCheckout = async () => {
         if (!selectedPaymentMethod) {
-            alert("Selecciona un método de pago.");
+            showToast("Selecciona un método de pago", 'info');
             return;
         }
 
         if (selectedPaymentMethod.key === 'CREDIT' && !selectedCustomer) {
-            alert("Por favor selecciona un cliente para ventas a crédito.");
+            showToast("Selecciona un cliente para crédito", 'info');
             return;
         }
 
@@ -144,13 +150,14 @@ export default function POSPage() {
             setSuccess(true);
             setCart([]);
             setSelectedCustomer(null);
+            showToast("Venta realizada con éxito");
             setTimeout(() => {
                 setSuccess(false);
                 setIsCheckoutOpen(false);
                 fetchProducts(); // Refresh stock
             }, 2000);
         } catch (error: any) {
-            alert(error.message || "Error al procesar la venta");
+            showToast(error.message || "Error al procesar la venta", 'error');
         } finally {
             setProcessing(false);
         }
@@ -352,8 +359,8 @@ export default function POSPage() {
                                                         key={method.id}
                                                         onClick={() => setSelectedPaymentMethod(method)}
                                                         className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all gap-2 ${selectedPaymentMethod?.id === method.id
-                                                                ? 'border-primary bg-primary/5 shadow-inner'
-                                                                : 'border-transparent bg-muted/30 hover:bg-muted/50'
+                                                            ? 'border-primary bg-primary/5 shadow-inner'
+                                                            : 'border-transparent bg-muted/30 hover:bg-muted/50'
                                                             }`}
                                                     >
                                                         <config.icon className="h-6 w-6" />
@@ -406,6 +413,13 @@ export default function POSPage() {
                         )}
                     </div>
                 </div>
+            )}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
             )}
         </div>
     );

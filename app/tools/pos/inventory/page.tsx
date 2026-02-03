@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { apiFetch } from "../../../lib/api";
 import { Product, Category } from "../../../types/pos";
+import Toast, { ToastType } from "../../../components/Toast";
 
 export default function InventoryPage() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -26,6 +27,12 @@ export default function InventoryPage() {
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Partial<Product>>({});
+    const [editingCategory, setEditingCategory] = useState<Partial<Category>>({});
+    const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
+
+    const showToast = (message: string, type: ToastType = 'success') => {
+        setToast({ message, type });
+    };
 
     useEffect(() => {
         fetchData();
@@ -74,8 +81,44 @@ export default function InventoryPage() {
             setIsProductModalOpen(false);
             setEditingProduct({});
             fetchData();
+            showToast(editingProduct.id ? "Producto actualizado" : "Producto creado correctamente");
         } catch (error: any) {
-            alert(error.message);
+            showToast(error.message, 'error');
+        }
+    };
+
+    const handleSaveCategory = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const method = editingCategory?.id ? 'PATCH' : 'POST';
+            const endpoint = editingCategory?.id ? `/inventory/categories/${editingCategory.id}` : '/inventory/categories';
+
+            const payload = {
+                name: editingCategory.name,
+                description: editingCategory.description || ""
+            };
+
+            await apiFetch(endpoint, {
+                method,
+                body: JSON.stringify(payload)
+            });
+
+            setEditingCategory({});
+            fetchData();
+            showToast(editingCategory.id ? "Categoría actualizada" : "Categoría creada correctamente");
+        } catch (error: any) {
+            showToast(error.message, 'error');
+        }
+    };
+
+    const handleDeleteCategory = async (id: string) => {
+        if (!confirm("¿Estás seguro de eliminar esta categoría? Esto podría afectar a los productos asociados.")) return;
+        try {
+            await apiFetch(`/inventory/categories/${id}`, { method: 'DELETE' });
+            fetchData();
+            showToast("Categoría eliminada");
+        } catch (error: any) {
+            showToast(error.message, 'error');
         }
     };
 
@@ -321,6 +364,96 @@ export default function InventoryPage() {
                         </form>
                     </div>
                 </div>
+            )}
+            {/* Category Modal */}
+            {isCategoryModalOpen && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[100] backdrop-blur-sm">
+                    <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl p-8 animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-black uppercase tracking-tighter">Gestión de Categorías</h2>
+                            <button onClick={() => { setIsCategoryModalOpen(false); setEditingCategory({}); }} className="p-2 hover:bg-muted rounded-full">
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {/* Form */}
+                            <div>
+                                <h3 className="text-xs font-black uppercase text-primary mb-4 tracking-widest">Nueva / Editar</h3>
+                                <form onSubmit={handleSaveCategory} className="space-y-4">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Nombre</label>
+                                        <input
+                                            required
+                                            type="text"
+                                            value={editingCategory?.name || ''}
+                                            onChange={e => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                                            className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Descripción</label>
+                                        <textarea
+                                            value={editingCategory?.description || ''}
+                                            onChange={e => setEditingCategory({ ...editingCategory, description: e.target.value })}
+                                            className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none h-24 resize-none"
+                                        />
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        className="w-full py-3 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 active:scale-95 transition-all"
+                                    >
+                                        {editingCategory?.id ? 'Actualizar' : 'Crear Categoría'}
+                                    </button>
+                                    {editingCategory?.id && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setEditingCategory({})}
+                                            className="w-full py-3 border border-muted-foreground/20 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-muted transition-all"
+                                        >
+                                            Cancelar Edición
+                                        </button>
+                                    )}
+                                </form>
+                            </div>
+
+                            {/* List */}
+                            <div className="border-l pl-8 overflow-y-auto max-h-[400px]">
+                                <h3 className="text-xs font-black uppercase text-primary mb-4 tracking-widest">Categorías Existentes</h3>
+                                <div className="space-y-2">
+                                    {categories.map(c => (
+                                        <div key={c.id} className="flex items-center justify-between p-3 bg-muted/20 rounded-2xl group hover:bg-muted/40 transition-all">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                                                    <Tag className="h-4 w-4" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-black uppercase leading-none">{c.name}</p>
+                                                    <p className="text-[10px] text-muted-foreground font-bold mt-1 line-clamp-1">{c.description}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button onClick={() => setEditingCategory(c)} className="p-2 hover:bg-primary/10 rounded-lg text-primary transition-colors">
+                                                    <Edit2 className="h-4 w-4" />
+                                                </button>
+                                                <button onClick={() => handleDeleteCategory(c.id)} className="p-2 hover:bg-destructive/10 rounded-lg text-destructive transition-colors">
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
             )}
         </div>
     );

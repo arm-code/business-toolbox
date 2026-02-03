@@ -111,11 +111,11 @@ export default function ReportsPage() {
                                     <div className="grid grid-cols-3 gap-4 border-t pt-6">
                                         <div className="bg-green-50 p-3 rounded-2xl">
                                             <p className="text-[9px] font-black text-green-700 uppercase mb-1">Efectivo</p>
-                                            <p className="text-sm font-black text-green-900">${Number(corte?.details?.['EFECTIVO'] || 0).toFixed(2)}</p>
+                                            <p className="text-sm font-black text-green-900">${Number(corte?.details?.['CASH'] || 0).toFixed(2)}</p>
                                         </div>
                                         <div className="bg-blue-50 p-3 rounded-2xl">
                                             <p className="text-[9px] font-black text-blue-700 uppercase mb-1">Tarjeta</p>
-                                            <p className="text-sm font-black text-blue-900">${Number(corte?.details?.['TARJETA'] || 0).toFixed(2)}</p>
+                                            <p className="text-sm font-black text-blue-900">${Number(corte?.details?.['CARD'] || 0).toFixed(2)}</p>
                                         </div>
                                         <div className="bg-orange-50 p-3 rounded-2xl">
                                             <p className="text-[9px] font-black text-orange-700 uppercase mb-1">Crédito (Fiao)</p>

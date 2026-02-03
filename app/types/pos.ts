@@ -7,11 +7,13 @@ export interface Category {
 export interface Product {
     id: string;
     name: string;
+    description?: string;
     barcode: string;
     purchasePrice: number;
     sellPrice: number;
     stock: number;
-    unit: 'UNIDAD' | 'PESO'; // Basado en la descripción de "decimales en stock"
+    minStock?: number;
+    unit: string;
     categoryId: string;
     category?: Category;
 }
@@ -28,11 +30,15 @@ export interface SaleItem {
     quantity: number;
 }
 
-export type PaymentType = 'EFECTIVO' | 'TARJETA' | 'CREDITO';
+export interface PaymentMethod {
+    id: string;
+    key: 'CASH' | 'CARD' | 'CREDIT' | string;
+    name: string;
+}
 
 export interface CreateSaleDto {
-    paymentType: PaymentType;
-    customerId?: string; // Requerido si es CREDITO
+    paymentMethodId: string;
+    customerId?: string; // Requerido si el método es Crédito
     items: SaleItem[];
 }
 

@@ -25,7 +25,7 @@ export default function InventoryPage() {
     const [search, setSearch] = useState("");
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-    const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
+    const [editingProduct, setEditingProduct] = useState<Partial<Product>>({});
 
     useEffect(() => {
         fetchData();
@@ -53,13 +53,26 @@ export default function InventoryPage() {
             const method = editingProduct?.id ? 'PATCH' : 'POST';
             const endpoint = editingProduct?.id ? `/inventory/products/${editingProduct.id}` : '/inventory/products';
 
+            // Clean payload to ensure correct types
+            const payload = {
+                name: editingProduct.name,
+                description: editingProduct.description || "",
+                barcode: editingProduct.barcode,
+                purchasePrice: Number(editingProduct.purchasePrice),
+                sellPrice: Number(editingProduct.sellPrice),
+                stock: Number(editingProduct.stock),
+                minStock: Number(editingProduct.minStock || 0),
+                unit: editingProduct.unit,
+                categoryId: editingProduct.categoryId
+            };
+
             await apiFetch(endpoint, {
                 method,
-                body: JSON.stringify(editingProduct)
+                body: JSON.stringify(payload)
             });
 
             setIsProductModalOpen(false);
-            setEditingProduct(null);
+            setEditingProduct({});
             fetchData();
         } catch (error: any) {
             alert(error.message);
@@ -98,7 +111,7 @@ export default function InventoryPage() {
                     </div>
 
                     <button
-                        onClick={() => { setEditingProduct({ unit: 'UNIDAD' }); setIsProductModalOpen(true); }}
+                        onClick={() => { setEditingProduct({ unit: 'UNIDAD', categoryId: categories[0]?.id || '' }); setIsProductModalOpen(true); }}
                         className="bg-primary text-primary-foreground rounded-3xl p-6 shadow-xl shadow-primary/20 flex items-center justify-center gap-3 active:scale-95 transition-all"
                     >
                         <Plus className="h-6 w-6" />
@@ -185,11 +198,11 @@ export default function InventoryPage() {
 
             {/* Product Modal */}
             {isProductModalOpen && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[100] backdrop-blur-sm">
-                    <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-8 animate-in zoom-in-95 duration-200">
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[100] backdrop-blur-sm overflow-y-auto">
+                    <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-8 my-8 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-black uppercase tracking-tighter">{editingProduct?.id ? 'Editar Producto' : 'Nuevo Producto'}</h2>
-                            <button onClick={() => setIsProductModalOpen(false)} className="p-2 hover:bg-muted rounded-full">
+                            <button onClick={() => { setIsProductModalOpen(false); setEditingProduct({}); }} className="p-2 hover:bg-muted rounded-full">
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
@@ -205,6 +218,44 @@ export default function InventoryPage() {
                                     className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold uppercase outline-none"
                                 />
                             </div>
+
+                            <div>
+                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Descripción (Opcional)</label>
+                                <textarea
+                                    value={editingProduct?.description || ''}
+                                    onChange={e => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                                    className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none h-20 resize-none"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Categoría</label>
+                                    <select
+                                        required
+                                        value={editingProduct?.categoryId || ''}
+                                        onChange={e => setEditingProduct({ ...editingProduct, categoryId: e.target.value })}
+                                        className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
+                                    >
+                                        <option value="" disabled>Seleccionar...</option>
+                                        {categories.map(c => (
+                                            <option key={c.id} value={c.id}>{c.name.toUpperCase()}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Unidad de Medida</label>
+                                    <select
+                                        value={editingProduct?.unit || 'UNIDAD'}
+                                        onChange={e => setEditingProduct({ ...editingProduct, unit: e.target.value })}
+                                        className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
+                                    >
+                                        <option value="UNIDAD">POR UNIDAD / PIEZA</option>
+                                        <option value="PESO">POR PESO / GRANEL</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Código de Barras</label>
@@ -217,17 +268,17 @@ export default function InventoryPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Unidad de Medida</label>
-                                    <select
-                                        value={editingProduct?.unit || 'UNIDAD'}
-                                        onChange={e => setEditingProduct({ ...editingProduct, unit: e.target.value as any })}
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Stock Mínimo</label>
+                                    <input
+                                        required
+                                        type="number"
+                                        value={editingProduct?.minStock || 0}
+                                        onChange={e => setEditingProduct({ ...editingProduct, minStock: parseFloat(e.target.value) })}
                                         className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
-                                    >
-                                        <option value="UNIDAD">POR UNIDAD / PIEZA</option>
-                                        <option value="PESO">POR PESO / GRANEL</option>
-                                    </select>
+                                    />
                                 </div>
                             </div>
+
                             <div className="grid grid-cols-3 gap-4">
                                 <div>
                                     <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">P. Compra</label>
@@ -265,7 +316,7 @@ export default function InventoryPage() {
                                 type="submit"
                                 className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-primary/20 mt-4 active:scale-95 transition-all"
                             >
-                                Guardar Cambios
+                                {editingProduct.id ? 'Actualizar Producto' : 'Guardar Producto'}
                             </button>
                         </form>
                     </div>

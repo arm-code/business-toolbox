@@ -20,7 +20,7 @@ import {
     BarChart3
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
-import { Product, Customer, PaymentType, CreateSaleDto } from "../../types/pos";
+import { Product, Customer, PaymentMethod, CreateSaleDto } from "../../types/pos";
 
 export default function POSPage() {
     const [search, setSearch] = useState("");
@@ -28,9 +28,10 @@ export default function POSPage() {
     const [cart, setCart] = useState<{ product: Product, quantity: number }[]>([]);
     const [loading, setLoading] = useState(false);
     const [customers, setCustomers] = useState<Customer[]>([]);
+    const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-    const [paymentType, setPaymentType] = useState<PaymentType>('EFECTIVO');
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
     const [processing, setProcessing] = useState(false);
     const [success, setSuccess] = useState(false);
 
@@ -38,6 +39,7 @@ export default function POSPage() {
     useEffect(() => {
         fetchProducts();
         fetchCustomers();
+        fetchPaymentMethods();
     }, []);
 
     // Search logic with debounce
@@ -66,6 +68,18 @@ export default function POSPage() {
             setCustomers(data);
         } catch (error) {
             console.error("Error fetching customers:", error);
+        }
+    };
+
+    const fetchPaymentMethods = async () => {
+        try {
+            const data = await apiFetch<PaymentMethod[]>("/sales/payment-methods/list");
+            setPaymentMethods(data);
+            // Default to CASH if available
+            const cash = data.find(m => m.key === 'CASH');
+            if (cash) setSelectedPaymentMethod(cash);
+        } catch (error) {
+            console.error("Error fetching payment methods:", error);
         }
     };
 
@@ -101,7 +115,12 @@ export default function POSPage() {
     };
 
     const handleCheckout = async () => {
-        if (paymentType === 'CREDITO' && !selectedCustomer) {
+        if (!selectedPaymentMethod) {
+            alert("Selecciona un método de pago.");
+            return;
+        }
+
+        if (selectedPaymentMethod.key === 'CREDIT' && !selectedCustomer) {
             alert("Por favor selecciona un cliente para ventas a crédito.");
             return;
         }
@@ -109,7 +128,7 @@ export default function POSPage() {
         try {
             setProcessing(true);
             const saleData: CreateSaleDto = {
-                paymentType,
+                paymentMethodId: selectedPaymentMethod.id,
                 customerId: selectedCustomer?.id,
                 items: cart.map(item => ({
                     productId: item.product.id,
@@ -321,28 +340,32 @@ export default function POSPage() {
                                     <div>
                                         <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block px-1 tracking-widest">Método de Pago</label>
                                         <div className="grid grid-cols-3 gap-3">
-                                            {[
-                                                { id: 'EFECTIVO', icon: Banknote, label: 'Efectivo', color: 'bg-green-50 text-green-700' },
-                                                { id: 'TARJETA', icon: CreditCard, label: 'Tarjeta', color: 'bg-blue-50 text-blue-700' },
-                                                { id: 'CREDITO', icon: Clock, label: 'Crédito', color: 'bg-orange-50 text-orange-700' }
-                                            ].map((type) => (
-                                                <button
-                                                    key={type.id}
-                                                    onClick={() => setPaymentType(type.id as PaymentType)}
-                                                    className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all gap-2 ${paymentType === type.id
-                                                        ? 'border-primary bg-primary/5 shadow-inner'
-                                                        : 'border-transparent bg-muted/30 hover:bg-muted/50'
-                                                        }`}
-                                                >
-                                                    <type.icon className="h-6 w-6" />
-                                                    <span className="text-[10px] font-black uppercase tracking-tighter">{type.label}</span>
-                                                </button>
-                                            ))}
+                                            {paymentMethods.map((method) => {
+                                                const config = {
+                                                    'CASH': { icon: Banknote, color: 'bg-green-50 text-green-700' },
+                                                    'CARD': { icon: CreditCard, color: 'bg-blue-50 text-blue-700' },
+                                                    'CREDIT': { icon: Clock, color: 'bg-orange-50 text-orange-700' }
+                                                }[method.key] || { icon: Banknote, color: 'bg-muted/30 text-muted-foreground' };
+
+                                                return (
+                                                    <button
+                                                        key={method.id}
+                                                        onClick={() => setSelectedPaymentMethod(method)}
+                                                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all gap-2 ${selectedPaymentMethod?.id === method.id
+                                                                ? 'border-primary bg-primary/5 shadow-inner'
+                                                                : 'border-transparent bg-muted/30 hover:bg-muted/50'
+                                                            }`}
+                                                    >
+                                                        <config.icon className="h-6 w-6" />
+                                                        <span className="text-[10px] font-black uppercase tracking-tighter">{method.name}</span>
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
                                     </div>
 
                                     {/* Customer Selection for Credit */}
-                                    {paymentType === 'CREDITO' && (
+                                    {selectedPaymentMethod?.key === 'CREDIT' && (
                                         <div className="animate-in slide-in-from-top duration-300">
                                             <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block px-1 tracking-widest">Seleccionar Cliente (Fiao)</label>
                                             <div className="relative">

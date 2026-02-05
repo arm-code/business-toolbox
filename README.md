@@ -9,12 +9,25 @@ A minimalist toolbox for business management, designed to be fast, responsive, a
 #### Project Vision
 Inspired by ILovePDF, this project is divided into micro-tools according to business needs (Sales, Quotes, Notes, etc.). It aims to provide a "single-purpose tool" experience for small businesses.
 
-#### Getting Started
+### ⚙️ Getting Started
 1. Clone repository
 2. Run `npm install`
-3. Run `npm run dev`
+3. Configure environment variables (see below)
+4. Run `npm run dev`
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+#### Environment Variables Configuration
+To connect the frontend with the backend, you need to set up the `NEXT_PUBLIC_API_URL` variable.
+
+1. **Development**:
+   - Create a file named `.env.local` in the root (you can use `template.env.local` as a reference).
+   - Set the URL to your local backend (e.g., `NEXT_PUBLIC_API_URL=http://localhost:4000/api`).
+2. **Production**:
+   - In your hosting provider (Vercel, Railway, etc.), add the environment variable `NEXT_PUBLIC_API_URL`.
+   - Set the value to your production API URL (e.g., `https://api.tu-dominio.com/api` or `http://192.168.1.100:4000/api`).
+   - **Important**: In production, do **not** use `localhost`. You must use the public domain name or the static IP address of the server where the backend is hosted.
+   - Ensure the URL **does not** end with a trailing slash for consistency.
 
 ---
 

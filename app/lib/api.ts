@@ -1,18 +1,42 @@
+import { ApiResponse } from '../types/pos';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const response = await fetch(`${API_URL}${endpoint}`, {
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`);
+    const headers = new Headers(options.headers);
+    headers.set('Content-Type', 'application/json');
+    if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
     }
 
-    return response.json();
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers,
+    });
+
+    // 401 logic should check status code directly for auth redirects
+    if (response.status === 401) {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            const isToolRoute = window.location.pathname.startsWith('/tools');
+            window.location.href = isToolRoute ? '/login?autoDemo=true' : '/login';
+        }
+        throw new Error('Sesión expirada. Por favor, inicia sesión de nuevo.');
+    }
+
+    const result = await response.json() as ApiResponse<T>;
+
+    if (!response.ok || !result.success) {
+        // Extract message from standardized error object
+        const errorMessage = result.error?.message
+            ? (Array.isArray(result.error.message) ? result.error.message[0] : result.error.message)
+            : (result.message || `Error: ${response.status} ${response.statusText}`);
+
+        throw new Error(errorMessage);
+    }
+
+    return result.data;
 }

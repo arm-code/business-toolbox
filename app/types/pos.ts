@@ -58,6 +58,7 @@ export interface CashClosingReport {
 }
 
 export interface NetProfitReport {
+    date?: string;
     revenue: number;
     cost: number;
     netProfit: number;
@@ -76,4 +77,117 @@ export interface SaleHistoryItem {
         subtotal: number | string;
         product: Product;
     }[];
+}
+
+// --- New Interfaces ---
+
+export interface Role {
+    id: string;
+    name: 'ADMIN' | 'USER' | 'GUEST' | string;
+    description: string;
+}
+
+export interface User {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: Role | 'ADMIN' | 'USER' | 'GUEST';
+    phone?: string | null;
+    address?: string | null;
+    avatar?: string | null;
+    isActive?: boolean;
+}
+
+export interface AuthResponse {
+    user: User;
+    token: string;
+}
+
+export interface Shift {
+    id: string;
+    userId?: string;
+    startTime: string;
+    endTime?: string | null;
+    initialBalance: string | number;
+    realBalance?: string | number;
+    expectedBalance?: string | number;
+    difference?: string | number;
+    status: 'OPEN' | 'CLOSED';
+    openedAt?: string; // Mantener por compatibilidad temporal si es necesario
+    closedAt?: string; // Mantener por compatibilidad temporal si es necesario
+    user?: User;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface Expense {
+    id: string;
+    description: string;
+    amount: number;
+    category: string;
+    shiftId: string;
+    createdAt: string;
+}
+
+export interface Supplier {
+    id: string;
+    name: string;
+    phone: string;
+}
+
+export interface PurchaseItem {
+    productId: string;
+    quantity: number;
+    costPrice: number;
+}
+
+export interface CreatePurchaseDto {
+    supplierId: string;
+    items: PurchaseItem[];
+}
+
+export interface Purchase {
+    id: string;
+    supplierId: string;
+    supplier: Supplier;
+    totalAmount: number;
+    createdAt: string;
+    items: {
+        id: string;
+        productId: string;
+        quantity: number;
+        costPrice: number;
+        product: Product;
+    }[];
+}
+
+export interface InventoryAdjustment {
+    productId: string;
+    quantity: number;
+    reason: string;
+}
+
+export interface ShiftExpensesReport {
+    expenses: Expense[];
+    totalAmount: number;
+    shift: {
+        initialBalance: number;
+        expectedBalance: number;
+        realBalance: number;
+    };
+}
+
+export interface ApiError {
+    statusCode: number;
+    message: string | string[];
+    path: string;
+    timestamp: string;
+}
+
+export interface ApiResponse<T> {
+    success: boolean;
+    data: T;
+    message?: string;
+    error?: ApiError;
 }

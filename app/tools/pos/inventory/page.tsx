@@ -14,10 +14,12 @@ import {
     Loader2,
     X,
     FolderPlus,
-    PackagePlus
+    PackagePlus,
+    AlertCircle,
+    Sparkles
 } from "lucide-react";
 import { apiFetch } from "../../../lib/api";
-import { Product, Category } from "../../../types/pos";
+import { Product, Category, User } from "../../../types/pos";
 import Toast, { ToastType } from "../../../components/Toast";
 
 export default function InventoryPage() {
@@ -33,12 +35,17 @@ export default function InventoryPage() {
     const [selectedProductForStock, setSelectedProductForStock] = useState<Product | null>(null);
     const [stockAmountToAdd, setStockAmountToAdd] = useState<number>(0);
     const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
+    const [user, setUser] = useState<User | null>(null);
 
     const showToast = (message: string, type: ToastType = 'success') => {
         setToast({ message, type });
     };
 
     useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
         fetchData();
     }, []);
 
@@ -160,7 +167,16 @@ export default function InventoryPage() {
                 </NextLink>
                 <div className="ml-auto flex items-center gap-2">
                     <Package className="h-5 w-5 text-primary" />
-                    <span className="font-bold tracking-tighter uppercase shrink-0">Gestión de Inventario</span>
+                    <span className="font-bold tracking-tighter uppercase shrink-0 mr-4">Gestión de Inventario</span>
+                    {(typeof user?.role === 'object' ? user.role.name : user?.role) === 'GUEST' && (
+                        <NextLink
+                            href="/register"
+                            className="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 animate-bounce"
+                        >
+                            <Sparkles className="h-3 w-3" />
+                            REGÍSTRATE GRATIS
+                        </NextLink>
+                    )}
                 </div>
             </header>
 
@@ -187,11 +203,19 @@ export default function InventoryPage() {
 
                     <button
                         onClick={() => setIsCategoryModalOpen(true)}
-                        className="bg-white border border-primary text-primary rounded-3xl p-6 shadow-sm flex items-center justify-center gap-3 hover:bg-primary/5 active:scale-95 transition-all"
+                        className="bg-white border border-primary text-primary rounded-3xl p-6 shadow-sm flex items-center justify-center gap-3 hover:bg-primary/5 active:scale-95 transition-all outline-none"
                     >
                         <FolderPlus className="h-6 w-6" />
                         <span className="font-black uppercase tracking-widest text-sm">Categorías</span>
                     </button>
+
+                    <NextLink
+                        href="/tools/pos/inventory/adjustments"
+                        className="bg-red-50 border border-red-200 text-red-600 rounded-3xl p-6 shadow-sm flex items-center justify-center gap-3 hover:bg-red-100 active:scale-95 transition-all outline-none"
+                    >
+                        <AlertCircle className="h-6 w-6" />
+                        <span className="font-black uppercase tracking-widest text-sm">Ajustes Manuales</span>
+                    </NextLink>
                 </div>
 
                 {/* Search & Table */}
@@ -284,7 +308,7 @@ export default function InventoryPage() {
 
                         <form onSubmit={handleSaveProduct} className="space-y-4">
                             <div>
-                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Nombre del Producto</label>
+                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Nombre del Producto <span className="text-red-500">*</span></label>
                                 <input
                                     required
                                     type="text"
@@ -305,7 +329,7 @@ export default function InventoryPage() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Categoría</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Categoría <span className="text-red-500">*</span></label>
                                     <select
                                         required
                                         value={editingProduct?.categoryId || ''}
@@ -333,7 +357,7 @@ export default function InventoryPage() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Código de Barras</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Código de Barras <span className="text-red-500">*</span></label>
                                     <input
                                         required
                                         type="text"
@@ -343,11 +367,12 @@ export default function InventoryPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Stock Mínimo</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Stock Mínimo <span className="text-red-500">*</span></label>
                                     <input
                                         required
                                         type="number"
-                                        value={editingProduct?.minStock || 0}
+                                        value={editingProduct?.minStock ?? ''}
+                                        placeholder="0"
                                         onChange={e => setEditingProduct({ ...editingProduct, minStock: parseFloat(e.target.value) })}
                                         className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
                                     />
@@ -356,31 +381,34 @@ export default function InventoryPage() {
 
                             <div className="grid grid-cols-3 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">P. Compra</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">P. Compra <span className="text-red-500">*</span></label>
                                     <input
                                         required
                                         type="number" step="0.01"
-                                        value={editingProduct?.purchasePrice || ''}
+                                        value={editingProduct?.purchasePrice ?? ''}
+                                        placeholder="0.00"
                                         onChange={e => setEditingProduct({ ...editingProduct, purchasePrice: parseFloat(e.target.value) })}
                                         className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">P. Venta</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">P. Venta <span className="text-red-500">*</span></label>
                                     <input
                                         required
                                         type="number" step="0.01"
-                                        value={editingProduct?.sellPrice || ''}
+                                        value={editingProduct?.sellPrice ?? ''}
+                                        placeholder="0.00"
                                         onChange={e => setEditingProduct({ ...editingProduct, sellPrice: parseFloat(e.target.value) })}
                                         className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Stock Actual</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Stock Actual <span className="text-red-500">*</span></label>
                                     <input
                                         required
                                         type="number" step="0.1"
-                                        value={editingProduct?.stock || ''}
+                                        value={editingProduct?.stock ?? ''}
+                                        placeholder="0"
                                         onChange={e => setEditingProduct({ ...editingProduct, stock: parseFloat(e.target.value) })}
                                         className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
                                     />
@@ -416,15 +444,14 @@ export default function InventoryPage() {
 
                         <form onSubmit={handleAddStock} className="space-y-4">
                             <div>
-                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Cantidad a Ingresar</label>
                                 <input
                                     required
                                     autoFocus
                                     type="number"
                                     step="0.01"
-                                    value={stockAmountToAdd || ''}
+                                    value={stockAmountToAdd ?? ''}
                                     onChange={e => setStockAmountToAdd(parseFloat(e.target.value))}
-                                    placeholder="Ej: 50"
+                                    placeholder="0"
                                     className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-4 text-2xl font-black text-center outline-none"
                                 />
                             </div>
@@ -456,7 +483,7 @@ export default function InventoryPage() {
                                 <h3 className="text-xs font-black uppercase text-primary mb-4 tracking-widest">Nueva / Editar</h3>
                                 <form onSubmit={handleSaveCategory} className="space-y-4">
                                     <div>
-                                        <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Nombre</label>
+                                        <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Nombre <span className="text-red-500">*</span></label>
                                         <input
                                             required
                                             type="text"

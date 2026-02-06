@@ -6,51 +6,90 @@ import {
     ArrowLeft,
     BarChart3,
     Banknote,
-    CreditCard,
-    Clock,
     TrendingUp,
     TrendingDown,
     Calendar,
     Loader2,
     DollarSign,
     History,
-    Package,
     CheckCircle2,
     X,
-    Eye
+    Eye,
+    AlertTriangle,
+    ArrowRight,
+    Sparkles
 } from "lucide-react";
 import { apiFetch } from "../../../lib/api";
-import { CashClosingReport, NetProfitReport, SaleHistoryItem } from "../../../types/pos";
+import { CashClosingReport, NetProfitReport, SaleHistoryItem, Shift, User, ShiftExpensesReport, Expense } from "../../../types/pos";
+import Toast, { ToastType } from "../../../components/Toast";
 
 export default function ReportsPage() {
-    const [corte, setCorte] = useState<CashClosingReport | null>(null);
-    const [profit, setProfit] = useState<NetProfitReport | null>(null);
-    const [history, setHistory] = useState<SaleHistoryItem[]>([]);
-    const [selectedSale, setSelectedSale] = useState<SaleHistoryItem | null>(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [netProfit, setNetProfit] = useState<NetProfitReport | null>(null);
+    const [shiftExpenses, setShiftExpenses] = useState<ShiftExpensesReport | null>(null);
+    const [salesHistory, setSalesHistory] = useState<SaleHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedShiftId, setSelectedShiftId] = useState("");
+    const [shifts, setShifts] = useState<Shift[]>([]);
+    const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
 
     useEffect(() => {
-        fetchReports();
-    }, [date]);
+        // Load user from localStorage to check roles
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+        fetchBasicData();
+    }, []);
 
-    const fetchReports = async () => {
+    useEffect(() => {
+        const role = typeof user?.role === 'object' ? user.role.name : user?.role;
+        if (role === 'ADMIN') {
+            fetchAdminReports();
+        }
+    }, [user, selectedDate, selectedShiftId]);
+
+    const showToast = (message: string, type: ToastType = 'success') => {
+        setToast({ message, type });
+    };
+
+    const fetchBasicData = async () => {
         try {
             setLoading(true);
-            const [cData, pData, hData] = await Promise.all([
-                apiFetch<CashClosingReport>(`/reports/corte-caja?date=${date}`),
-                apiFetch<NetProfitReport>(`/reports/net-profit?startDate=${date}&endDate=${date}`),
-                apiFetch<SaleHistoryItem[]>(`/sales/history?date=${date}`)
+            const [sales, shiftsData] = await Promise.all([
+                apiFetch<SaleHistoryItem[]>("/sales/history?limit=10"),
+                apiFetch<Shift[]>("/finance/shifts?limit=5")
             ]);
-            setCorte(cData);
-            setProfit(pData);
-            setHistory(hData);
+            setSalesHistory(sales);
+            setShifts(shiftsData);
+            if (shiftsData.length > 0 && !selectedShiftId) {
+                setSelectedShiftId(shiftsData[0].id);
+            }
         } catch (error) {
-            console.error("Error fetching reports:", error);
+            console.error("Error fetching data:", error);
         } finally {
             setLoading(false);
         }
     };
+
+    const fetchAdminReports = async () => {
+        try {
+            const [profitData] = await Promise.all([
+                apiFetch<NetProfitReport>(`/reports/net-profit?date=${selectedDate}`)
+            ]);
+            setNetProfit(profitData);
+
+            if (selectedShiftId) {
+                const expenseData = await apiFetch<ShiftExpensesReport>(`/reports/shift-expenses?shiftId=${selectedShiftId}`);
+                setShiftExpenses(expenseData);
+            }
+        } catch (error) {
+            console.error("Admin report error:", error);
+        }
+    };
+
+    const isAdmin = user?.role === 'ADMIN';
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
@@ -59,242 +98,181 @@ export default function ReportsPage() {
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Volver al POS
                 </NextLink>
-                <div className="ml-auto flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-primary" />
-                    <span className="font-bold tracking-tighter uppercase">Reportes de Negocio</span>
+                <div className="ml-auto flex items-center gap-2 text-primary">
+                    <BarChart3 className="h-5 w-5" />
+                    <span className="font-bold tracking-tighter uppercase mr-4">Reportes e Inteligencia</span>
+                    {(typeof user?.role === 'object' ? user.role.name : user?.role) === 'GUEST' && (
+                        <NextLink
+                            href="/register"
+                            className="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 animate-bounce"
+                        >
+                            <Sparkles className="h-3 w-3" />
+                            REGÍSTRATE GRATIS
+                        </NextLink>
+                    )}
                 </div>
             </header>
 
-            <main className="flex-1 p-4 md:p-8 max-w-5xl mx-auto w-full">
-                {/* Filter */}
-                <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-white p-6 rounded-3xl border shadow-sm">
+            <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
                     <div>
-                        <h1 className="text-2xl font-black tracking-tighter uppercase text-primary">Resumen de Operaciones</h1>
-                        <p className="text-sm text-muted-foreground uppercase font-bold tracking-widest text-[10px]">Cierre del día y rentabilidad</p>
+                        <h1 className="text-3xl font-black tracking-tighter uppercase text-primary">Análisis de Negocio</h1>
+                        <p className="text-sm text-muted-foreground uppercase font-bold tracking-widest text-[11px] opacity-70">Monitoreo de rendimiento y finanzas</p>
                     </div>
-                    <div className="flex items-center gap-3 bg-muted/30 p-2 rounded-2xl border">
-                        <Calendar className="h-4 w-4 text-primary ml-2" />
-                        <input
-                            type="date"
-                            value={date}
-                            onChange={(e) => setDate(e.target.value)}
-                            className="bg-transparent border-none outline-none font-bold text-sm h-8 uppercase"
-                        />
-                    </div>
+
+                    {isAdmin ? (
+                        <div className="flex gap-4">
+                            <div className="bg-white border rounded-2xl p-2 px-4 flex items-center gap-3">
+                                <Calendar className="h-4 w-4 text-primary" />
+                                <input
+                                    type="date"
+                                    value={selectedDate}
+                                    onChange={(e) => setSelectedDate(e.target.value)}
+                                    className="text-xs font-black uppercase outline-none"
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-center gap-3">
+                            <AlertTriangle className="h-5 w-5 text-amber-600" />
+                            <p className="text-xs font-bold text-amber-800 uppercase italic">Se requiere rol de ADMINISTRADOR para ver informes financieros detallados.</p>
+                        </div>
+                    )}
                 </div>
 
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
-                        <p className="text-sm font-black uppercase tracking-widest opacity-50">Calculando reportes...</p>
-                    </div>
-                ) : (
-                    <div className="space-y-8 animate-in fade-in duration-500">
-                        {/* Summary Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Cash Closing */}
-                            <div className="bg-white border rounded-[2.5rem] p-8 shadow-sm">
-                                <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2">
-                                    <Banknote className="h-4 w-4" /> Corte de Caja del Día
-                                </h2>
-                                <div className="space-y-6">
-                                    <div className="flex justify-between items-end">
-                                        <div>
-                                            <p className="text-[10px] font-black text-muted-foreground uppercase">Dinero Total Recibido</p>
-                                            <p className="text-4xl font-black text-primary tracking-tighter">${Number(corte?.totalIncome || 0).toFixed(2)}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-[10px] font-black text-muted-foreground uppercase">Ventas Realizadas</p>
-                                            <p className="text-xl font-black text-primary">{corte?.totalSales || 0}</p>
-                                        </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Admin Dashboard */}
+                    <div className="lg:col-span-2 space-y-8">
+                        {isAdmin ? (
+                            <div className="space-y-8 animate-in fade-in duration-500">
+                                {/* Profit Summary Cards */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="bg-white border rounded-[2.5rem] p-8 shadow-sm">
+                                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Ventas Brutas</p>
+                                        <p className="text-4xl font-black text-slate-800 tracking-tighter">${netProfit?.revenue.toFixed(2) || "0.00"}</p>
                                     </div>
-                                    <div className="grid grid-cols-3 gap-4 border-t pt-6">
-                                        <div className="bg-green-50 p-3 rounded-2xl">
-                                            <p className="text-[9px] font-black text-green-700 uppercase mb-1">Efectivo</p>
-                                            <p className="text-sm font-black text-green-900">${Number(corte?.details?.['CASH'] || 0).toFixed(2)}</p>
-                                        </div>
-                                        <div className="bg-blue-50 p-3 rounded-2xl">
-                                            <p className="text-[9px] font-black text-blue-700 uppercase mb-1">Tarjeta</p>
-                                            <p className="text-sm font-black text-blue-900">${Number(corte?.details?.['CARD'] || 0).toFixed(2)}</p>
-                                        </div>
-                                        <div className="bg-orange-50 p-3 rounded-2xl">
-                                            <p className="text-[9px] font-black text-orange-700 uppercase mb-1">Crédito (Fiao)</p>
-                                            <p className="text-sm font-black text-orange-900">${Number(corte?.details?.['CREDIT'] || 0).toFixed(2)}</p>
-                                        </div>
+                                    <div className="bg-white border rounded-[2.5rem] p-8 shadow-sm">
+                                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Costo de Inversión</p>
+                                        <p className="text-4xl font-black text-red-500 tracking-tighter">-${netProfit?.cost.toFixed(2) || "0.00"}</p>
+                                    </div>
+                                    <div className="bg-primary text-white rounded-[2.5rem] p-8 shadow-2xl shadow-primary/20">
+                                        <p className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-1">Utilidad Neta</p>
+                                        <p className="text-4xl font-black tracking-tighter">${netProfit?.netProfit.toFixed(2) || "0.00"}</p>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Net Profit */}
-                            <div className="bg-primary text-primary-foreground rounded-[2.5rem] p-8 shadow-xl shadow-primary/20 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-8 opacity-10">
-                                    <TrendingUp className="h-32 w-32" />
-                                </div>
-                                <h2 className="text-sm font-black uppercase tracking-widest text-primary-foreground/70 mb-6 flex items-center gap-2">
-                                    <TrendingUp className="h-4 w-4" /> Rentabilidad del Periodo
-                                </h2>
-                                <div className="space-y-6 relative z-10">
-                                    <div>
-                                        <p className="text-[10px] font-black text-primary-foreground/70 uppercase">Ganancia Real (Limpia)</p>
-                                        <p className="text-5xl font-black tracking-tighter">${Number(profit?.netProfit || 0).toFixed(2)}</p>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4 border-t border-white/20 pt-6">
-                                        <div>
-                                            <p className="text-[9px] font-black text-primary-foreground/70 uppercase mb-1">Ventas Totales</p>
-                                            <p className="text-lg font-black">${Number(profit?.revenue || 0).toFixed(2)}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[9px] font-black text-primary-foreground/70 uppercase mb-1 flex items-center gap-1">
-                                                <TrendingDown className="h-3 w-3" /> Costo Mercancía
-                                            </p>
-                                            <p className="text-lg font-black">${Number(profit?.cost || 0).toFixed(2)}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Breakdown / Insights */}
-                        <div className="bg-violet-900 rounded-[2.5rem] p-10 text-white flex flex-col md:flex-row items-center gap-8 shadow-2xl">
-                            <div className="h-20 w-20 bg-white/10 rounded-3xl flex items-center justify-center shrink-0">
-                                <BarChart3 className="h-10 w-10 text-violet-200" />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-black tracking-tighter uppercase mb-2">Análisis de Operación</h3>
-                                <p className="text-violet-200 text-sm leading-relaxed max-w-xl">
-                                    Hoy has procesado un total de <span className="text-white font-bold">${Number(corte?.totalIncome || 0).toFixed(2)}</span> en ventas brutas.
-                                    La ganancia real después de costos es de <span className="text-white font-bold">${Number(profit?.netProfit || 0).toFixed(2)}</span>. ¡Buen trabajo administrando tu negocio!
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Sales History List */}
-                        <div className="bg-white border rounded-[2.5rem] p-8 shadow-sm">
-                            <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground mb-6 flex items-center justify-between">
-                                <span className="flex items-center gap-2"><History className="h-4 w-4" /> Historial de Operaciones</span>
-                                <span className="text-[10px] bg-muted px-2 py-1 rounded-full">{history.length} TRANSACCIONES</span>
-                            </h2>
-                            <div className="space-y-4">
-                                {history.length === 0 ? (
-                                    <div className="text-center py-10 opacity-30">
-                                        <Package className="h-10 w-10 mx-auto mb-2" />
-                                        <p className="text-sm font-black uppercase tracking-widest">Sin operaciones registradas</p>
-                                    </div>
-                                ) : (
-                                    history.map((sale) => (
-                                        <button
-                                            key={sale.id}
-                                            onClick={() => setSelectedSale(sale)}
-                                            className="w-full text-left flex flex-col md:flex-row md:items-center justify-between p-5 bg-muted/20 rounded-[2rem] border-2 border-transparent hover:border-primary/20 hover:bg-muted/30 transition-all gap-4 group"
+                                {/* Shift Details Section */}
+                                <div className="bg-white border rounded-[3rem] p-8 shadow-sm">
+                                    <div className="flex justify-between items-center mb-8">
+                                        <h2 className="text-lg font-black uppercase tracking-tighter text-primary flex items-center gap-2">
+                                            <Banknote className="h-5 w-5" /> Desglose por Turno
+                                        </h2>
+                                        <select
+                                            value={selectedShiftId}
+                                            onChange={(e) => setSelectedShiftId(e.target.value)}
+                                            className="bg-muted/50 border-none rounded-xl p-3 text-xs font-black uppercase outline-none"
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-primary shadow-sm border">
-                                                    <CheckCircle2 className="h-6 w-6" />
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <p className="text-sm font-black uppercase leading-none">Venta #{sale.id.slice(0, 8).toUpperCase()}</p>
-                                                        <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${sale.paymentMethod.key === 'CASH' ? 'bg-green-100 text-green-700' :
-                                                            sale.paymentMethod.key === 'CARD' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
-                                                            }`}>
-                                                            {sale.paymentMethod.name}
-                                                        </span>
+                                            <option value="">Seleccionar Turno</option>
+                                            {shifts.map(s => (
+                                                <option key={s.id} value={s.id}>
+                                                    Turno {new Date(s.startTime || s.openedAt || "").toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ({s.id.slice(0, 5).toUpperCase()})
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {shiftExpenses ? (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <div className="space-y-4">
+                                                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest border-b pb-2">Gastos Operativos</p>
+                                                <div className="space-y-3">
+                                                    {shiftExpenses.expenses?.length === 0 ? (
+                                                        <p className="text-xs italic text-center py-6 opacity-30">Sin gastos</p>
+                                                    ) : shiftExpenses.expenses?.map((e: Expense) => (
+                                                        <div key={e.id} className="flex justify-between items-center text-sm font-bold">
+                                                            <span className="text-slate-500 uppercase">{e.description}</span>
+                                                            <span className="text-red-500">-${Number(e.amount).toFixed(2)}</span>
+                                                        </div>
+                                                    ))}
+                                                    <div className="pt-4 border-t flex justify-between items-center font-black">
+                                                        <span className="text-xs uppercase">Total Gastos</span>
+                                                        <span className="text-lg tracking-tighter text-red-600">-${Number(shiftExpenses.totalAmount).toFixed(2)}</span>
                                                     </div>
-                                                    <p className="text-[10px] text-muted-foreground font-bold mt-1">
-                                                        {new Date(sale.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {sale.items.length} {sale.items.length === 1 ? 'Producto' : 'Productos'}
-                                                        {sale.customer && ` • Cliente: ${sale.customer.name}`}
-                                                    </p>
                                                 </div>
                                             </div>
-                                            <div className="text-right flex items-center gap-3">
-                                                <p className="text-xl font-black text-primary tracking-tighter">${Number(sale.total).toFixed(2)}</p>
-                                                <div className="hidden group-hover:block p-2 bg-primary text-white rounded-full transition-all">
-                                                    <Eye className="h-4 w-4" />
+
+                                            <div className="p-6 bg-slate-50 rounded-3xl border">
+                                                <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4">Balance de Turno</p>
+                                                <div className="space-y-4">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-xs font-bold uppercase">Base Caja:</span>
+                                                        <span className="text-sm font-black">${Number(shiftExpenses.shift?.initialBalance || 0).toFixed(2)}</span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-xs font-bold uppercase">Esperado:</span>
+                                                        <span className="text-sm font-black text-primary">${Number(shiftExpenses.shift?.expectedBalance || 0).toFixed(2)}</span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-xs font-bold uppercase">Real Registrado:</span>
+                                                        <span className="text-sm font-black">${Number(shiftExpenses.shift?.realBalance || 0).toFixed(2)}</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </button>
-                                    ))
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </main>
-
-            {/* Sale Details Modal */}
-            {selectedSale && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-200">
-                    <div className="bg-background w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in duration-300 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-8">
-                            <button onClick={() => setSelectedSale(null)} className="p-2 hover:bg-muted rounded-full transition-colors">
-                                <X className="h-6 w-6" />
-                            </button>
-                        </div>
-
-                        <div className="mb-8">
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="p-3 bg-primary/10 rounded-2xl">
-                                    <CheckCircle2 className="h-6 w-6 text-primary" />
-                                </div>
-                                <div>
-                                    <h2 className="text-2xl font-black tracking-tighter uppercase text-primary">Detalle de Venta</h2>
-                                    <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Op: #{selectedSale.id.slice(0, 8).toUpperCase()}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="space-y-6">
-                            <div className="bg-muted/30 rounded-3xl p-6 border group">
-                                <div className="flex justify-between items-center mb-4 pb-4 border-b border-black/5">
-                                    <span className="text-xs font-black uppercase text-muted-foreground">Información</span>
-                                    <span className={`text-[10px] font-black px-3 py-1 rounded-full ${selectedSale.paymentMethod.key === 'CASH' ? 'bg-green-100 text-green-700' :
-                                        selectedSale.paymentMethod.key === 'CARD' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
-                                        }`}>
-                                        {selectedSale.paymentMethod.name}
-                                    </span>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <p className="text-[9px] font-black text-muted-foreground uppercase mb-1">Fecha y Hora</p>
-                                        <p className="text-sm font-bold uppercase">{new Date(selectedSale.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[9px] font-black text-muted-foreground uppercase mb-1">Cliente</p>
-                                        <p className="text-sm font-bold uppercase">{selectedSale.customer?.name || 'PUBLICO GENERAL'}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-4 max-h-[300px] overflow-y-auto px-1 scrollbar-hide">
-                                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest px-1">Productos Vendidos ({selectedSale.items.length})</p>
-                                {selectedSale.items.map((item, idx) => (
-                                    <div key={idx} className="flex justify-between items-center bg-white p-4 rounded-2xl border shadow-sm">
-                                        <div className="flex-1">
-                                            <p className="text-xs font-black uppercase leading-none mb-1">{item.product.name}</p>
-                                            <p className="text-[9px] text-muted-foreground font-bold">{Number(item.quantity)} x ${Number(item.price).toFixed(2)} / {item.product.unit.toLowerCase()}</p>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-sm font-black text-primary">${Number(item.subtotal).toFixed(2)}</p>
+                                    ) : (
+                                        <div className="text-center py-20 opacity-20 italic font-black uppercase tracking-widest">
+                                            Selecciona un turno para auditar los gastos
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-white border rounded-[3rem] p-20 text-center shadow-sm">
+                                <AlertTriangle className="h-20 w-20 text-amber-200 mx-auto mb-6" />
+                                <h2 className="text-2xl font-black uppercase tracking-tighter mb-4">Contenido Restringido</h2>
+                                <p className="text-muted-foreground text-sm max-w-sm mx-auto font-medium">Los reportes de utilidad, costos y auditoría de turnos solo están disponibles para perfiles con rango de administración.</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Sales History Sidebar */}
+                    <div className="space-y-8">
+                        <div className="bg-white border rounded-[3rem] p-8 shadow-sm flex flex-col min-h-[500px]">
+                            <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground mb-6 flex items-center justify-between">
+                                <span className="flex items-center gap-2"><History className="h-4 w-4" /> Últimas Ventas</span>
+                                <span className="bg-muted px-2 py-0.5 rounded-full text-[9px]">{salesHistory.length}</span>
+                            </h2>
+                            <div className="space-y-4 flex-1 overflow-y-auto pr-2 scrollbar-hide">
+                                {salesHistory.map(sale => (
+                                    <div key={sale.id} className="p-4 bg-muted/20 rounded-3xl border border-transparent hover:border-violet-100 transition-all group">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <span className="text-[10px] font-black uppercase text-slate-400">#{sale.id.slice(-6)}</span>
+                                            <span className="text-[10px] font-bold text-muted-foreground">{new Date(sale.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                        </div>
+                                        <div className="flex justify-between items-end">
+                                            <div>
+                                                <p className="text-xs font-black uppercase">{sale.customer?.name || "VENTA PÚBLICO"}</p>
+                                                <p className="text-[9px] text-muted-foreground font-bold mt-1 uppercase">{sale.paymentMethod.name}</p>
+                                            </div>
+                                            <p className="text-lg font-black text-primary tracking-tighter">${Number(sale.total).toFixed(2)}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-
-                            <div className="bg-primary text-primary-foreground rounded-3xl p-6 flex justify-between items-center shadow-xl shadow-primary/20">
-                                <div>
-                                    <p className="text-[10px] font-black uppercase opacity-70 tracking-widest leading-none">Total Pagado</p>
-                                    <p className="text-3xl font-black tracking-tighter mt-1">${Number(selectedSale.total).toFixed(2)}</p>
-                                </div>
-                                <button
-                                    onClick={() => setSelectedSale(null)}
-                                    className="px-6 py-3 bg-white/20 hover:bg-white/30 rounded-2xl font-black uppercase text-xs transition-all"
-                                >
-                                    Cerrar Detail
-                                </button>
-                            </div>
+                            <NextLink href="/tools/pos" className="mt-6 flex items-center justify-center gap-2 text-primary font-black uppercase text-[10px] group">
+                                Nueva Venta <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+                            </NextLink>
                         </div>
                     </div>
                 </div>
+            </main>
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
             )}
         </div>
     );

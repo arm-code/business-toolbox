@@ -34,7 +34,7 @@ export default function PurchasesPage() {
 
     // Purchase Form State
     const [selectedSupplier, setSelectedSupplier] = useState<string>("");
-    const [purchaseItems, setPurchaseItems] = useState<{ productId: string, quantity: number, costPrice: number, productName: string }[]>([]);
+    const [purchaseItems, setPurchaseItems] = useState<{ productId: string, quantity: string | number, costPrice: string | number, productName: string }[]>([]);
     const [productSearch, setProductSearch] = useState("");
 
     // UI State
@@ -109,7 +109,7 @@ export default function PurchasesPage() {
         }]);
     };
 
-    const updateItem = (index: number, field: string, value: number) => {
+    const updateItem = (index: number, field: string, value: string | number) => {
         const newItems = [...purchaseItems];
         newItems[index] = { ...newItems[index], [field]: value };
         setPurchaseItems(newItems);
@@ -131,12 +131,27 @@ export default function PurchasesPage() {
 
         try {
             setProcessing(true);
+
+            // Validation
+            for (let i = 0; i < purchaseItems.length; i++) {
+                const item = purchaseItems[i];
+                const qty = Number(item.quantity);
+                const cost = Number(item.costPrice);
+
+                if (isNaN(qty) || qty <= 0) {
+                    throw new Error(`La cantidad para ${item.productName} debe ser mayor a 0`);
+                }
+                if (isNaN(cost) || cost <= 0) {
+                    throw new Error(`El costo para ${item.productName} debe ser mayor a 0`);
+                }
+            }
+
             const purchaseData: CreatePurchaseDto = {
                 supplierId: selectedSupplier,
                 items: purchaseItems.map(item => ({
                     productId: item.productId,
-                    quantity: item.quantity,
-                    costPrice: item.costPrice
+                    quantity: Number(item.quantity),
+                    costPrice: Number(item.costPrice)
                 }))
             };
 
@@ -157,7 +172,7 @@ export default function PurchasesPage() {
     };
 
     const calculateTotal = () => {
-        return purchaseItems.reduce((total, item) => total + (item.quantity * item.costPrice), 0);
+        return purchaseItems.reduce((total, item) => total + (Number(item.quantity) * Number(item.costPrice)), 0);
     };
 
     const filteredProducts = products.filter(p =>
@@ -277,16 +292,18 @@ export default function PurchasesPage() {
                                                     <div className="col-span-3">
                                                         <input
                                                             type="number"
-                                                            value={item.quantity}
-                                                            onChange={(e) => updateItem(idx, 'quantity', parseFloat(e.target.value) || 0)}
+                                                            value={item.quantity ?? ''}
+                                                            placeholder="0"
+                                                            onChange={(e) => updateItem(idx, 'quantity', e.target.value)}
                                                             className="w-full bg-white border rounded-xl py-2 px-1 text-center text-xs font-bold outline-none"
                                                         />
                                                     </div>
                                                     <div className="col-span-3">
                                                         <input
                                                             type="number"
-                                                            value={item.costPrice}
-                                                            onChange={(e) => updateItem(idx, 'costPrice', parseFloat(e.target.value) || 0)}
+                                                            value={item.costPrice ?? ''}
+                                                            placeholder="0.00"
+                                                            onChange={(e) => updateItem(idx, 'costPrice', e.target.value)}
                                                             className="w-full bg-white border rounded-xl py-2 px-1 text-center text-xs font-bold outline-none"
                                                         />
                                                     </div>
@@ -362,26 +379,28 @@ export default function PurchasesPage() {
                                 <X className="h-6 w-6" />
                             </button>
                         </div>
-                        <div className="space-y-5">
+                        <div className="space-y-4">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest ml-1">Nombre de la Distribuidora</label>
+                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest ml-1">Nombre del Proveedor <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
+                                    required
                                     value={newSupplier.name}
-                                    onChange={(e) => setNewSupplier({ ...newSupplier, name: e.target.value })}
-                                    placeholder="Ej. Distribuidora Monterrey"
+                                    onChange={(e) => setNewSupplier({ ...newSupplier, name: e.target.value.toUpperCase() })}
+                                    placeholder="EJ. ABARROTES DON JUAN"
                                     className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/20 rounded-2xl p-4 text-sm font-bold outline-none uppercase"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest ml-1">Teléfono</label>
+                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest ml-1">Teléfono <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                     <input
                                         type="tel"
+                                        required
                                         value={newSupplier.phone}
                                         onChange={(e) => setNewSupplier({ ...newSupplier, phone: e.target.value })}
-                                        placeholder="8112345678"
+                                        placeholder="656XXXXXXX"
                                         className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/20 rounded-2xl p-4 pl-12 text-sm font-bold outline-none"
                                     />
                                 </div>

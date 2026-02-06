@@ -109,7 +109,7 @@ export default function FinancePage() {
             setProcessing(true);
             const closedShift = await apiFetch<Shift>("/finance/shift/close", {
                 method: 'POST',
-                body: JSON.stringify({ realBalance: parseFloat(realBalance) })
+                body: JSON.stringify({ realBalance: parseFloat(realBalance) || 0 })
             });
             setActiveShift(null);
             setExpenses([]);
@@ -262,23 +262,25 @@ export default function FinancePage() {
                         </div>
                         <div className="space-y-5">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest ml-1">Descripción</label>
+                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest ml-1">Descripción <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     value={newExpense.description}
                                     onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
                                     placeholder="Ej. Pago de Luz"
+                                    required
                                     className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/20 rounded-2xl p-4 text-sm font-bold outline-none uppercase"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest ml-1">Monto ($)</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest ml-1">Monto ($) <span className="text-red-500">*</span></label>
                                     <input
                                         type="number"
-                                        value={newExpense.amount}
-                                        onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+                                        value={newExpense.amount ?? ''}
                                         placeholder="0.00"
+                                        onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+                                        required
                                         className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/20 rounded-2xl p-4 text-sm font-bold outline-none"
                                     />
                                 </div>

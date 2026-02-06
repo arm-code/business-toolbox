@@ -308,7 +308,7 @@ export default function InventoryPage() {
 
                         <form onSubmit={handleSaveProduct} className="space-y-4">
                             <div>
-                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Nombre del Producto</label>
+                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Nombre del Producto <span className="text-red-500">*</span></label>
                                 <input
                                     required
                                     type="text"
@@ -329,7 +329,7 @@ export default function InventoryPage() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Categoría</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Categoría <span className="text-red-500">*</span></label>
                                     <select
                                         required
                                         value={editingProduct?.categoryId || ''}
@@ -357,7 +357,7 @@ export default function InventoryPage() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Código de Barras</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Código de Barras <span className="text-red-500">*</span></label>
                                     <input
                                         required
                                         type="text"
@@ -367,11 +367,12 @@ export default function InventoryPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Stock Mínimo</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Stock Mínimo <span className="text-red-500">*</span></label>
                                     <input
                                         required
                                         type="number"
-                                        value={editingProduct?.minStock || 0}
+                                        value={editingProduct?.minStock ?? ''}
+                                        placeholder="0"
                                         onChange={e => setEditingProduct({ ...editingProduct, minStock: parseFloat(e.target.value) })}
                                         className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
                                     />
@@ -380,31 +381,34 @@ export default function InventoryPage() {
 
                             <div className="grid grid-cols-3 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">P. Compra</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">P. Compra <span className="text-red-500">*</span></label>
                                     <input
                                         required
                                         type="number" step="0.01"
-                                        value={editingProduct?.purchasePrice || ''}
+                                        value={editingProduct?.purchasePrice ?? ''}
+                                        placeholder="0.00"
                                         onChange={e => setEditingProduct({ ...editingProduct, purchasePrice: parseFloat(e.target.value) })}
                                         className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">P. Venta</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">P. Venta <span className="text-red-500">*</span></label>
                                     <input
                                         required
                                         type="number" step="0.01"
-                                        value={editingProduct?.sellPrice || ''}
+                                        value={editingProduct?.sellPrice ?? ''}
+                                        placeholder="0.00"
                                         onChange={e => setEditingProduct({ ...editingProduct, sellPrice: parseFloat(e.target.value) })}
                                         className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Stock Actual</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Stock Actual <span className="text-red-500">*</span></label>
                                     <input
                                         required
                                         type="number" step="0.1"
-                                        value={editingProduct?.stock || ''}
+                                        value={editingProduct?.stock ?? ''}
+                                        placeholder="0"
                                         onChange={e => setEditingProduct({ ...editingProduct, stock: parseFloat(e.target.value) })}
                                         className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-3 text-sm font-bold outline-none"
                                     />
@@ -440,15 +444,14 @@ export default function InventoryPage() {
 
                         <form onSubmit={handleAddStock} className="space-y-4">
                             <div>
-                                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Cantidad a Ingresar</label>
                                 <input
                                     required
                                     autoFocus
                                     type="number"
                                     step="0.01"
-                                    value={stockAmountToAdd || ''}
+                                    value={stockAmountToAdd ?? ''}
                                     onChange={e => setStockAmountToAdd(parseFloat(e.target.value))}
-                                    placeholder="Ej: 50"
+                                    placeholder="0"
                                     className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/30 rounded-2xl p-4 text-2xl font-black text-center outline-none"
                                 />
                             </div>
@@ -480,7 +483,7 @@ export default function InventoryPage() {
                                 <h3 className="text-xs font-black uppercase text-primary mb-4 tracking-widest">Nueva / Editar</h3>
                                 <form onSubmit={handleSaveCategory} className="space-y-4">
                                     <div>
-                                        <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Nombre</label>
+                                        <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest pl-1 mb-1 block">Nombre <span className="text-red-500">*</span></label>
                                         <input
                                             required
                                             type="text"

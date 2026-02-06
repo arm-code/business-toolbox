@@ -1,3 +1,5 @@
+import { ApiResponse } from '../types/pos';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -14,6 +16,7 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
         headers,
     });
 
+    // 401 logic should check status code directly for auth redirects
     if (response.status === 401) {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('token');
@@ -24,10 +27,16 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
         throw new Error('Sesión expirada. Por favor, inicia sesión de nuevo.');
     }
 
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`);
+    const result = await response.json() as ApiResponse<T>;
+
+    if (!response.ok || !result.success) {
+        // Extract message from standardized error object
+        const errorMessage = result.error?.message
+            ? (Array.isArray(result.error.message) ? result.error.message[0] : result.error.message)
+            : (result.message || `Error: ${response.status} ${response.statusText}`);
+
+        throw new Error(errorMessage);
     }
 
-    return response.json();
+    return result.data;
 }

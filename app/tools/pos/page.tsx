@@ -43,7 +43,7 @@ export default function POSPage() {
     const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
     const [activeShift, setActiveShift] = useState<Shift | null>(null);
     const [showShiftModal, setShowShiftModal] = useState(false);
-    const [initialBalance, setInitialBalance] = useState("0");
+    const [initialBalance, setInitialBalance] = useState("");
     const [user, setUser] = useState<User | null>(null);
 
     const showToast = (message: string, type: ToastType = 'success') => {
@@ -78,7 +78,7 @@ export default function POSPage() {
             setProcessing(true);
             const shift = await apiFetch<Shift>("/finance/shift/open", {
                 method: 'POST',
-                body: JSON.stringify({ initialBalance: parseFloat(initialBalance) })
+                body: JSON.stringify({ initialBalance: parseFloat(initialBalance) || 0 })
             });
             setActiveShift(shift);
             setShowShiftModal(false);
@@ -582,11 +582,13 @@ export default function POSPage() {
 
                         <div className="space-y-4">
                             <div>
-                                <label className="text-[10px] font-black uppercase text-muted-foreground mb-2 block px-1 tracking-widest">Fondo de Caja (Efectivo)</label>
+                                <label className="text-[10px] font-black uppercase text-muted-foreground mb-2 block px-1 tracking-widest">Fondo de Caja (Efectivo) <span className="text-red-500">*</span></label>
                                 <input
                                     type="number"
                                     value={initialBalance}
+                                    placeholder="0"
                                     onChange={(e) => setInitialBalance(e.target.value)}
+                                    required
                                     className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/20 rounded-2xl p-4 text-center text-3xl font-black outline-none transition-all"
                                 />
                             </div>

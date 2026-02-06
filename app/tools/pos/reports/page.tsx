@@ -44,7 +44,8 @@ export default function ReportsPage() {
     }, []);
 
     useEffect(() => {
-        if (user?.role === 'ADMIN') {
+        const role = typeof user?.role === 'object' ? user.role.name : user?.role;
+        if (role === 'ADMIN') {
             fetchAdminReports();
         }
     }, [user, selectedDate, selectedShiftId]);
@@ -100,7 +101,7 @@ export default function ReportsPage() {
                 <div className="ml-auto flex items-center gap-2 text-primary">
                     <BarChart3 className="h-5 w-5" />
                     <span className="font-bold tracking-tighter uppercase mr-4">Reportes e Inteligencia</span>
-                    {user?.role === 'GUEST' && (
+                    {(typeof user?.role === 'object' ? user.role.name : user?.role) === 'GUEST' && (
                         <NextLink
                             href="/register"
                             className="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 animate-bounce"
@@ -174,7 +175,7 @@ export default function ReportsPage() {
                                             <option value="">Seleccionar Turno</option>
                                             {shifts.map(s => (
                                                 <option key={s.id} value={s.id}>
-                                                    Turno {new Date(s.openedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ({s.id.slice(0, 5).toUpperCase()})
+                                                    Turno {new Date(s.startTime || s.openedAt || "").toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ({s.id.slice(0, 5).toUpperCase()})
                                                 </option>
                                             ))}
                                         </select>

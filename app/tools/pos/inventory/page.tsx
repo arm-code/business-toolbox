@@ -168,7 +168,7 @@ export default function InventoryPage() {
                 <div className="ml-auto flex items-center gap-2">
                     <Package className="h-5 w-5 text-primary" />
                     <span className="font-bold tracking-tighter uppercase shrink-0 mr-4">Gestión de Inventario</span>
-                    {user?.role === 'GUEST' && (
+                    {(typeof user?.role === 'object' ? user.role.name : user?.role) === 'GUEST' && (
                         <NextLink
                             href="/register"
                             className="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 animate-bounce"

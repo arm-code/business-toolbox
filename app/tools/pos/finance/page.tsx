@@ -114,7 +114,7 @@ export default function FinancePage() {
             setActiveShift(null);
             setExpenses([]);
             setShowCloseModal(false);
-            showToast(`Turno cerrado. Descuadre: $${(closedShift.realBalance! - closedShift.expectedBalance!).toFixed(2)}`);
+            showToast(`Turno cerrado. Descuadre: $${(Number(closedShift.realBalance || 0) - Number(closedShift.expectedBalance || 0)).toFixed(2)}`);
         } catch (error: any) {
             showToast(error.message || "Error al cerrar turno", "error");
         } finally {
@@ -134,7 +134,7 @@ export default function FinancePage() {
                 <div className="ml-auto flex items-center gap-2 text-primary">
                     <Banknote className="h-5 w-5" />
                     <span className="font-bold tracking-tighter uppercase mr-4">Gestión de Finanzas</span>
-                    {user?.role === 'GUEST' && (
+                    {(typeof user?.role === 'object' ? user.role.name : user?.role) === 'GUEST' && (
                         <NextLink
                             href="/register"
                             className="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 animate-bounce"
@@ -191,6 +191,9 @@ export default function FinancePage() {
                     </div>
                 ) : (
                     <div className="space-y-8 animate-in fade-in duration-500">
+                        <div className="bg-white border rounded-2xl p-4 flex justify-between items-center mb-2">
+                            <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Iniciado: {new Date(activeShift.startTime || activeShift.openedAt || "").toLocaleString()}</span>
+                        </div>
                         {/* Stats Summary */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="bg-white border rounded-[2rem] p-6 shadow-sm">

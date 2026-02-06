@@ -277,7 +277,7 @@ export default function POSPage() {
                         />
                     </div>
                     <div className="ml-4 flex items-center gap-1 shrink-0">
-                        {user?.role === 'GUEST' && (
+                        {(typeof user?.role === 'object' ? user.role.name : user?.role) === 'GUEST' && (
                             <NextLink
                                 href="/register"
                                 className="bg-primary text-white text-[10px] font-black px-4 py-2.5 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 animate-bounce mr-2"

@@ -81,14 +81,22 @@ export interface SaleHistoryItem {
 
 // --- New Interfaces ---
 
+export interface Role {
+    id: string;
+    name: 'ADMIN' | 'USER' | 'GUEST' | string;
+    description: string;
+}
+
 export interface User {
     id: string;
     email: string;
     firstName: string;
     lastName: string;
-    role: 'ADMIN' | 'USER' | 'GUEST';
-    phone?: string;
-    address?: string;
+    role: Role | 'ADMIN' | 'USER' | 'GUEST';
+    phone?: string | null;
+    address?: string | null;
+    avatar?: string | null;
+    isActive?: boolean;
 }
 
 export interface AuthResponse {
@@ -98,14 +106,19 @@ export interface AuthResponse {
 
 export interface Shift {
     id: string;
-    userId: string;
-    initialBalance: number;
-    realBalance?: number;
-    expectedBalance?: number;
+    userId?: string;
+    startTime: string;
+    endTime?: string | null;
+    initialBalance: string | number;
+    realBalance?: string | number;
+    expectedBalance?: string | number;
+    difference?: string | number;
     status: 'OPEN' | 'CLOSED';
-    openedAt: string;
-    closedAt?: string;
+    openedAt?: string; // Mantener por compatibilidad temporal si es necesario
+    closedAt?: string; // Mantener por compatibilidad temporal si es necesario
     user?: User;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export interface Expense {

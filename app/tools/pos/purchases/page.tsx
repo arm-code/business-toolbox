@@ -175,7 +175,7 @@ export default function PurchasesPage() {
                 <div className="ml-auto flex items-center gap-2 text-primary">
                     <Truck className="h-5 w-5" />
                     <span className="font-bold tracking-tighter uppercase mr-4">Compras y Proveedores</span>
-                    {user?.role === 'GUEST' && (
+                    {(typeof user?.role === 'object' ? user.role.name : user?.role) === 'GUEST' && (
                         <NextLink
                             href="/register"
                             className="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 animate-bounce"

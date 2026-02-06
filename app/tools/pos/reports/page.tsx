@@ -16,7 +16,8 @@ import {
     X,
     Eye,
     AlertTriangle,
-    ArrowRight
+    ArrowRight,
+    Sparkles
 } from "lucide-react";
 import { apiFetch } from "../../../lib/api";
 import { CashClosingReport, NetProfitReport, SaleHistoryItem, Shift, User } from "../../../types/pos";
@@ -35,7 +36,7 @@ export default function ReportsPage() {
 
     useEffect(() => {
         // Load user from localStorage to check roles
-        const storedUser = localStorage.getItem('pos_user');
+        const storedUser = localStorage.getItem('user');
         if (storedUser) {
             setUser(JSON.parse(storedUser));
         }
@@ -98,7 +99,16 @@ export default function ReportsPage() {
                 </NextLink>
                 <div className="ml-auto flex items-center gap-2 text-primary">
                     <BarChart3 className="h-5 w-5" />
-                    <span className="font-bold tracking-tighter uppercase">Reportes e Inteligencia</span>
+                    <span className="font-bold tracking-tighter uppercase mr-4">Reportes e Inteligencia</span>
+                    {user?.role === 'GUEST' && (
+                        <NextLink
+                            href="/register"
+                            className="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 animate-bounce"
+                        >
+                            <Sparkles className="h-3 w-3" />
+                            REGÍSTRATE GRATIS
+                        </NextLink>
+                    )}
                 </div>
             </header>
 

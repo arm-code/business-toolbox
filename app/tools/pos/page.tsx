@@ -7,7 +7,7 @@ import {
     Search,
     ShoppingCart,
     Trash2,
-    User,
+    User as UserIcon,
     CreditCard,
     Banknote,
     Clock,
@@ -19,10 +19,11 @@ import {
     Loader2,
     BarChart3,
     Printer,
-    Truck
+    Truck,
+    Sparkles
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
-import { Product, Customer, PaymentMethod, CreateSaleDto, SaleHistoryItem, Shift } from "../../types/pos";
+import { Product, Customer, PaymentMethod, CreateSaleDto, SaleHistoryItem, Shift, User } from "../../types/pos";
 import Toast, { ToastType } from "../../components/Toast";
 import Ticket from "../../components/Ticket";
 
@@ -43,6 +44,7 @@ export default function POSPage() {
     const [activeShift, setActiveShift] = useState<Shift | null>(null);
     const [showShiftModal, setShowShiftModal] = useState(false);
     const [initialBalance, setInitialBalance] = useState("0");
+    const [user, setUser] = useState<User | null>(null);
 
     const showToast = (message: string, type: ToastType = 'success') => {
         setToast({ message, type });
@@ -50,6 +52,10 @@ export default function POSPage() {
 
     // Load initial data
     useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
         checkActiveShift();
         fetchProducts();
         fetchCustomers();
@@ -271,6 +277,16 @@ export default function POSPage() {
                         />
                     </div>
                     <div className="ml-4 flex items-center gap-1 shrink-0">
+                        {user?.role === 'GUEST' && (
+                            <NextLink
+                                href="/register"
+                                className="bg-primary text-white text-[10px] font-black px-4 py-2.5 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 animate-bounce mr-2"
+                            >
+                                <Sparkles className="h-3 w-3" />
+                                <span className="hidden sm:inline">REGÍSTRATE GRATIS</span>
+                                <span className="sm:hidden">REGISTRAR</span>
+                            </NextLink>
+                        )}
                         <NextLink
                             href="/tools/pos/purchases"
                             className="p-2.5 bg-muted rounded-xl hover:bg-primary/10 hover:text-primary transition-all flex items-center gap-2"
@@ -283,7 +299,7 @@ export default function POSPage() {
                             className="p-2.5 bg-muted rounded-xl hover:bg-primary/10 hover:text-primary transition-all flex items-center gap-2"
                             title="Clientes"
                         >
-                            <User className="h-5 w-5" />
+                            <UserIcon className="h-5 w-5" />
                         </NextLink>
                         <NextLink
                             href="/tools/pos/finance"
@@ -513,7 +529,7 @@ export default function POSPage() {
                                         <div className="animate-in slide-in-from-top duration-300">
                                             <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block px-1 tracking-widest">Seleccionar Cliente (Fiao)</label>
                                             <div className="relative">
-                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                                <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                                 <select
                                                     value={selectedCustomer?.id || ""}
                                                     onChange={(e) => {

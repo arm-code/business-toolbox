@@ -14,7 +14,8 @@ import {
     X,
     CheckCircle2,
     Calendar,
-    History
+    History,
+    Sparkles
 } from "lucide-react";
 import { apiFetch } from "../../../lib/api";
 import { Shift, Expense, User } from "../../../types/pos";
@@ -41,7 +42,13 @@ export default function FinancePage() {
 
     const categories = ["Luz", "Renta", "Proveedor", "Retiro Personal", "Otros"];
 
+    const [user, setUser] = useState<User | null>(null);
+
     useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
         fetchData();
     }, []);
 
@@ -126,7 +133,16 @@ export default function FinancePage() {
                 </NextLink>
                 <div className="ml-auto flex items-center gap-2 text-primary">
                     <Banknote className="h-5 w-5" />
-                    <span className="font-bold tracking-tighter uppercase">Gestión de Finanzas</span>
+                    <span className="font-bold tracking-tighter uppercase mr-4">Gestión de Finanzas</span>
+                    {user?.role === 'GUEST' && (
+                        <NextLink
+                            href="/register"
+                            className="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 animate-bounce"
+                        >
+                            <Sparkles className="h-3 w-3" />
+                            REGÍSTRATE GRATIS
+                        </NextLink>
+                    )}
                 </div>
             </header>
 

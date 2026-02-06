@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Mail, Lock, Loader2, ArrowRight, Sparkles } from "lucide-react";
 import { apiFetch } from "../lib/api";
 import { AuthResponse } from "../types/pos";
@@ -9,11 +9,21 @@ import Toast, { ToastType } from "../components/Toast";
 
 export default function LoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [demoLoading, setDemoLoading] = useState(false);
     const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
+
+    useEffect(() => {
+        const autoDemo = searchParams.get('autoDemo');
+        const loggedInUser = localStorage.getItem('user');
+
+        if (autoDemo === 'true' && !loggedInUser) {
+            handleDemo();
+        }
+    }, [searchParams]);
 
     const showToast = (message: string, type: ToastType = 'success') => {
         setToast({ message, type });

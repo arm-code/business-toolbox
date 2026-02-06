@@ -15,10 +15,11 @@ import {
     X,
     FolderPlus,
     PackagePlus,
-    AlertCircle
+    AlertCircle,
+    Sparkles
 } from "lucide-react";
 import { apiFetch } from "../../../lib/api";
-import { Product, Category } from "../../../types/pos";
+import { Product, Category, User } from "../../../types/pos";
 import Toast, { ToastType } from "../../../components/Toast";
 
 export default function InventoryPage() {
@@ -34,12 +35,17 @@ export default function InventoryPage() {
     const [selectedProductForStock, setSelectedProductForStock] = useState<Product | null>(null);
     const [stockAmountToAdd, setStockAmountToAdd] = useState<number>(0);
     const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
+    const [user, setUser] = useState<User | null>(null);
 
     const showToast = (message: string, type: ToastType = 'success') => {
         setToast({ message, type });
     };
 
     useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
         fetchData();
     }, []);
 
@@ -161,7 +167,16 @@ export default function InventoryPage() {
                 </NextLink>
                 <div className="ml-auto flex items-center gap-2">
                     <Package className="h-5 w-5 text-primary" />
-                    <span className="font-bold tracking-tighter uppercase shrink-0">Gestión de Inventario</span>
+                    <span className="font-bold tracking-tighter uppercase shrink-0 mr-4">Gestión de Inventario</span>
+                    {user?.role === 'GUEST' && (
+                        <NextLink
+                            href="/register"
+                            className="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 animate-bounce"
+                        >
+                            <Sparkles className="h-3 w-3" />
+                            REGÍSTRATE GRATIS
+                        </NextLink>
+                    )}
                 </div>
             </header>
 

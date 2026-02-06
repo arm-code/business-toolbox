@@ -16,10 +16,11 @@ import {
     UserPlus,
     History,
     CheckCircle2,
-    Phone
+    Phone,
+    Sparkles
 } from "lucide-react";
 import { apiFetch } from "../../../lib/api";
-import { Product, Supplier, CreatePurchaseDto, Purchase } from "../../../types/pos";
+import { Product, Supplier, CreatePurchaseDto, Purchase, User } from "../../../types/pos";
 import Toast, { ToastType } from "../../../components/Toast";
 
 export default function PurchasesPage() {
@@ -29,6 +30,7 @@ export default function PurchasesPage() {
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState(false);
     const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
+    const [user, setUser] = useState<User | null>(null);
 
     // Purchase Form State
     const [selectedSupplier, setSelectedSupplier] = useState<string>("");
@@ -40,6 +42,10 @@ export default function PurchasesPage() {
     const [newSupplier, setNewSupplier] = useState({ name: "", phone: "" });
 
     useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
         fetchInitialData();
     }, []);
 
@@ -168,7 +174,16 @@ export default function PurchasesPage() {
                 </NextLink>
                 <div className="ml-auto flex items-center gap-2 text-primary">
                     <Truck className="h-5 w-5" />
-                    <span className="font-bold tracking-tighter uppercase">Compras y Proveedores</span>
+                    <span className="font-bold tracking-tighter uppercase mr-4">Compras y Proveedores</span>
+                    {user?.role === 'GUEST' && (
+                        <NextLink
+                            href="/register"
+                            className="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 animate-bounce"
+                        >
+                            <Sparkles className="h-3 w-3" />
+                            REGÍSTRATE GRATIS
+                        </NextLink>
+                    )}
                 </div>
             </header>
 

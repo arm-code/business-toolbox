@@ -18,7 +18,8 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
         if (typeof window !== 'undefined') {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.location.href = '/login';
+            const isToolRoute = window.location.pathname.startsWith('/tools');
+            window.location.href = isToolRoute ? '/login?autoDemo=true' : '/login';
         }
         throw new Error('Sesión expirada. Por favor, inicia sesión de nuevo.');
     }

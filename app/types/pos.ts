@@ -58,6 +58,7 @@ export interface CashClosingReport {
 }
 
 export interface NetProfitReport {
+    date?: string;
     revenue: number;
     cost: number;
     netProfit: number;
@@ -76,4 +77,80 @@ export interface SaleHistoryItem {
         subtotal: number | string;
         product: Product;
     }[];
+}
+
+// --- New Interfaces ---
+
+export interface User {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: 'ADMIN' | 'USER' | 'GUEST';
+    phone?: string;
+    address?: string;
+}
+
+export interface AuthResponse {
+    user: User;
+    token: string;
+}
+
+export interface Shift {
+    id: string;
+    userId: string;
+    initialBalance: number;
+    realBalance?: number;
+    expectedBalance?: number;
+    status: 'OPEN' | 'CLOSED';
+    openedAt: string;
+    closedAt?: string;
+    user?: User;
+}
+
+export interface Expense {
+    id: string;
+    description: string;
+    amount: number;
+    category: string;
+    shiftId: string;
+    createdAt: string;
+}
+
+export interface Supplier {
+    id: string;
+    name: string;
+    phone: string;
+}
+
+export interface PurchaseItem {
+    productId: string;
+    quantity: number;
+    costPrice: number;
+}
+
+export interface CreatePurchaseDto {
+    supplierId: string;
+    items: PurchaseItem[];
+}
+
+export interface Purchase {
+    id: string;
+    supplierId: string;
+    supplier: Supplier;
+    total: number;
+    createdAt: string;
+    items: {
+        id: string;
+        productId: string;
+        quantity: number;
+        costPrice: number;
+        product: Product;
+    }[];
+}
+
+export interface InventoryAdjustment {
+    productId: string;
+    quantity: number;
+    reason: string;
 }

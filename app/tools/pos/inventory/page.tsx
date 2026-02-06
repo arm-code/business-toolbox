@@ -14,7 +14,8 @@ import {
     Loader2,
     X,
     FolderPlus,
-    PackagePlus
+    PackagePlus,
+    AlertCircle
 } from "lucide-react";
 import { apiFetch } from "../../../lib/api";
 import { Product, Category } from "../../../types/pos";
@@ -187,11 +188,19 @@ export default function InventoryPage() {
 
                     <button
                         onClick={() => setIsCategoryModalOpen(true)}
-                        className="bg-white border border-primary text-primary rounded-3xl p-6 shadow-sm flex items-center justify-center gap-3 hover:bg-primary/5 active:scale-95 transition-all"
+                        className="bg-white border border-primary text-primary rounded-3xl p-6 shadow-sm flex items-center justify-center gap-3 hover:bg-primary/5 active:scale-95 transition-all outline-none"
                     >
                         <FolderPlus className="h-6 w-6" />
                         <span className="font-black uppercase tracking-widest text-sm">Categorías</span>
                     </button>
+
+                    <NextLink
+                        href="/tools/pos/inventory/adjustments"
+                        className="bg-red-50 border border-red-200 text-red-600 rounded-3xl p-6 shadow-sm flex items-center justify-center gap-3 hover:bg-red-100 active:scale-95 transition-all outline-none"
+                    >
+                        <AlertCircle className="h-6 w-6" />
+                        <span className="font-black uppercase tracking-widest text-sm">Ajustes Manuales</span>
+                    </NextLink>
                 </div>
 
                 {/* Search & Table */}

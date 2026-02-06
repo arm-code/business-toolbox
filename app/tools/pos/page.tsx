@@ -18,10 +18,11 @@ import {
     Minus,
     Loader2,
     BarChart3,
-    Printer
+    Printer,
+    Truck
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
-import { Product, Customer, PaymentMethod, CreateSaleDto, SaleHistoryItem } from "../../types/pos";
+import { Product, Customer, PaymentMethod, CreateSaleDto, SaleHistoryItem, Shift } from "../../types/pos";
 import Toast, { ToastType } from "../../components/Toast";
 import Ticket from "../../components/Ticket";
 
@@ -39,6 +40,9 @@ export default function POSPage() {
     const [success, setSuccess] = useState(false);
     const [lastSale, setLastSale] = useState<SaleHistoryItem | null>(null);
     const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
+    const [activeShift, setActiveShift] = useState<Shift | null>(null);
+    const [showShiftModal, setShowShiftModal] = useState(false);
+    const [initialBalance, setInitialBalance] = useState("0");
 
     const showToast = (message: string, type: ToastType = 'success') => {
         setToast({ message, type });
@@ -46,10 +50,39 @@ export default function POSPage() {
 
     // Load initial data
     useEffect(() => {
+        checkActiveShift();
         fetchProducts();
         fetchCustomers();
         fetchPaymentMethods();
     }, []);
+
+    const checkActiveShift = async () => {
+        try {
+            const shift = await apiFetch<Shift>("/finance/shift/active");
+            setActiveShift(shift);
+            if (!shift) setShowShiftModal(true);
+        } catch (error) {
+            console.error("Error checking shift:", error);
+            setShowShiftModal(true);
+        }
+    };
+
+    const handleOpenShift = async () => {
+        try {
+            setProcessing(true);
+            const shift = await apiFetch<Shift>("/finance/shift/open", {
+                method: 'POST',
+                body: JSON.stringify({ initialBalance: parseFloat(initialBalance) })
+            });
+            setActiveShift(shift);
+            setShowShiftModal(false);
+            showToast("Turno abierto con éxito");
+        } catch (error: any) {
+            showToast(error.message || "Error al abrir turno", 'error');
+        } finally {
+            setProcessing(false);
+        }
+    };
 
     // Keyboard Shortcuts
     useEffect(() => {
@@ -239,11 +272,25 @@ export default function POSPage() {
                     </div>
                     <div className="ml-4 flex items-center gap-1 shrink-0">
                         <NextLink
+                            href="/tools/pos/purchases"
+                            className="p-2.5 bg-muted rounded-xl hover:bg-primary/10 hover:text-primary transition-all flex items-center gap-2"
+                            title="Proveedores y Compras"
+                        >
+                            <Truck className="h-5 w-5" />
+                        </NextLink>
+                        <NextLink
                             href="/tools/pos/customers"
                             className="p-2.5 bg-muted rounded-xl hover:bg-primary/10 hover:text-primary transition-all flex items-center gap-2"
                             title="Clientes"
                         >
                             <User className="h-5 w-5" />
+                        </NextLink>
+                        <NextLink
+                            href="/tools/pos/finance"
+                            className="p-2.5 bg-muted rounded-xl hover:bg-primary/10 hover:text-primary transition-all flex items-center gap-2"
+                            title="Finanzas"
+                        >
+                            <Banknote className="h-5 w-5" />
                         </NextLink>
                         <NextLink
                             href="/tools/pos/inventory"
@@ -501,6 +548,45 @@ export default function POSPage() {
                                 </div>
                             </>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* Shift Modal Overlay */}
+            {showShiftModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[110] animate-in fade-in duration-200">
+                    <div className="bg-background w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in duration-300">
+                        <div className="text-center mb-6">
+                            <div className="h-16 w-16 bg-violet-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <Clock className="h-8 w-8 text-primary" />
+                            </div>
+                            <h2 className="text-2xl font-black uppercase tracking-tighter">Abrir Turno</h2>
+                            <p className="text-sm text-muted-foreground italic">Es necesario abrir caja para registrar ventas.</p>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-[10px] font-black uppercase text-muted-foreground mb-2 block px-1 tracking-widest">Fondo de Caja (Efectivo)</label>
+                                <input
+                                    type="number"
+                                    value={initialBalance}
+                                    onChange={(e) => setInitialBalance(e.target.value)}
+                                    className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/20 rounded-2xl p-4 text-center text-3xl font-black outline-none transition-all"
+                                />
+                            </div>
+
+                            <button
+                                onClick={handleOpenShift}
+                                disabled={processing}
+                                className="w-full py-5 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-widest text-lg shadow-2xl shadow-primary/30 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                            >
+                                {processing ? <Loader2 className="h-6 w-6 animate-spin" /> : "Empezar Turno"}
+                            </button>
+
+                            <NextLink href="/catalog" className="block text-center text-xs font-bold text-muted-foreground uppercase hover:underline py-2">
+                                Volver al catálogo
+                            </NextLink>
+                        </div>
                     </div>
                 </div>
             )}

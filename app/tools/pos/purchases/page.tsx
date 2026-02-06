@@ -342,7 +342,7 @@ export default function PurchasesPage() {
                                             <p className="text-[10px] text-muted-foreground font-bold mb-3">
                                                 {new Date(p.createdAt).toLocaleDateString()} • {p.items.length} PRD
                                             </p>
-                                            <p className="text-xl font-black text-primary tracking-tighter">${Number(p.total).toFixed(2)}</p>
+                                            <p className="text-xl font-black text-primary tracking-tighter">${Number(p.totalAmount).toFixed(2)}</p>
                                         </div>
                                     ))
                                 )}

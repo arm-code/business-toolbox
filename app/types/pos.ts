@@ -138,7 +138,7 @@ export interface Purchase {
     id: string;
     supplierId: string;
     supplier: Supplier;
-    total: number;
+    totalAmount: number;
     createdAt: string;
     items: {
         id: string;
@@ -153,4 +153,14 @@ export interface InventoryAdjustment {
     productId: string;
     quantity: number;
     reason: string;
+}
+
+export interface ShiftExpensesReport {
+    expenses: Expense[];
+    totalAmount: number;
+    shift: {
+        initialBalance: number;
+        expectedBalance: number;
+        realBalance: number;
+    };
 }

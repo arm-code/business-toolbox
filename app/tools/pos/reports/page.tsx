@@ -20,13 +20,13 @@ import {
     Sparkles
 } from "lucide-react";
 import { apiFetch } from "../../../lib/api";
-import { CashClosingReport, NetProfitReport, SaleHistoryItem, Shift, User } from "../../../types/pos";
+import { CashClosingReport, NetProfitReport, SaleHistoryItem, Shift, User, ShiftExpensesReport, Expense } from "../../../types/pos";
 import Toast, { ToastType } from "../../../components/Toast";
 
 export default function ReportsPage() {
     const [user, setUser] = useState<User | null>(null);
     const [netProfit, setNetProfit] = useState<NetProfitReport | null>(null);
-    const [shiftExpenses, setShiftExpenses] = useState<any>(null);
+    const [shiftExpenses, setShiftExpenses] = useState<ShiftExpensesReport | null>(null);
     const [salesHistory, setSalesHistory] = useState<SaleHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -80,7 +80,7 @@ export default function ReportsPage() {
             setNetProfit(profitData);
 
             if (selectedShiftId) {
-                const expenseData = await apiFetch<any>(`/reports/shift-expenses?shiftId=${selectedShiftId}`);
+                const expenseData = await apiFetch<ShiftExpensesReport>(`/reports/shift-expenses?shiftId=${selectedShiftId}`);
                 setShiftExpenses(expenseData);
             }
         } catch (error) {
@@ -187,7 +187,7 @@ export default function ReportsPage() {
                                                 <div className="space-y-3">
                                                     {shiftExpenses.expenses?.length === 0 ? (
                                                         <p className="text-xs italic text-center py-6 opacity-30">Sin gastos</p>
-                                                    ) : shiftExpenses.expenses?.map((e: any) => (
+                                                    ) : shiftExpenses.expenses?.map((e: Expense) => (
                                                         <div key={e.id} className="flex justify-between items-center text-sm font-bold">
                                                             <span className="text-slate-500 uppercase">{e.description}</span>
                                                             <span className="text-red-500">-${Number(e.amount).toFixed(2)}</span>

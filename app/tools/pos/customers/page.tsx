@@ -209,7 +209,7 @@ export default function CustomersPage() {
                             </h2>
                             <form onSubmit={handleSaveCustomer} className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground px-1 tracking-widest">Nombre Completo</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground px-1 tracking-widest">Nombre Completo <span className="text-red-500">*</span></label>
                                     <input
                                         required
                                         type="text"
@@ -220,7 +220,7 @@ export default function CustomersPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground px-1 tracking-widest">Teléfono de Contacto</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground px-1 tracking-widest">Teléfono de Contacto <span className="text-red-500">*</span></label>
                                     <div className="relative">
                                         <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                         <input
@@ -228,6 +228,7 @@ export default function CustomersPage() {
                                             placeholder="656XXXXXXX"
                                             value={editingCustomer?.phone || ""}
                                             onChange={(e) => setEditingCustomer({ ...editingCustomer, phone: e.target.value })}
+                                            required
                                             className="w-full bg-muted/40 border-2 border-transparent focus:border-primary/20 rounded-2xl p-4 pl-12 text-sm font-bold outline-none transition-all"
                                         />
                                     </div>
@@ -286,16 +287,18 @@ export default function CustomersPage() {
 
                             <div className="space-y-4 text-left">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-muted-foreground px-1 tracking-widest">Monto del Abono ($)</label>
+                                    <label className="text-[10px] font-black uppercase text-muted-foreground px-1 tracking-widest">Monto del Abono ($) <span className="text-red-500">*</span></label>
                                     <input
                                         type="number"
                                         step="0.1"
                                         value={abonoAmount}
                                         onChange={(e) => setAbonoAmount(e.target.value)}
+                                        required
                                         placeholder="0.00"
                                         className="w-full bg-background border-none rounded-2xl py-4 px-4 text-2xl font-black text-primary text-center outline-none ring-2 ring-primary/10 focus:ring-primary/40 transition-all shadow-inner"
                                         autoFocus
                                     />
+                                    <span></span>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <button

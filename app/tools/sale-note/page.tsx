@@ -7,7 +7,7 @@ import { useSaleNote } from "./hooks/use-sale-note";
 import { SaleItem } from "./types";
 
 export default function SaleNote() {
-    const { items, total, addItem, updateItem, removeItem } = useSaleNote();
+    const { items, total, addItem, updateItem, removeItem, isHydrated } = useSaleNote();
     const [client, setClient] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,6 +44,13 @@ export default function SaleNote() {
     const handlePrint = () => {
         window.print();
     };
+
+    if (!isHydrated && items.length === 0) {
+        return (
+            <div className="flex justify-center p-10">
+                Cargando...
+            </div>)
+    }
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
@@ -172,7 +179,7 @@ export default function SaleNote() {
                     </div>
 
                     <div className="mt-12 text-center text-[10px] text-muted-foreground border-t pt-4">
-                        Gracias por su preferencia • Generado por arm-solutions
+                        Gracias por su preferencia • Generado por business-toolbox
                     </div>
                 </div>
             </main>
@@ -197,7 +204,7 @@ export default function SaleNote() {
 
             {/* Unified Modal Overlay */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-[100] animate-in fade-in duration-200 backdrop-blur-sm">
+                <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-100 animate-in fade-in duration-200 backdrop-blur-sm">
                     <div className="bg-background w-full max-w-lg rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-lg font-bold tracking-tighter uppercase">{editingItem && items.find(i => i.id === editingItem.id) ? "Editar Artículo" : "Agregar Artículo"}</h2>

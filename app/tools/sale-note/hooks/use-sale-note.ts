@@ -1,15 +1,41 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SaleItem } from '../types';
+import { toast } from 'sonner';
+
+const STORAGE_KEY = 'sale-note-items';
 
 export const useSaleNote = () => {
-  const [items, setItems] = useState<SaleItem[]>([
-    {
-      id: crypto.randomUUID(),
-      quantity: 1,
-      description: '',
-      price: 0,
-    },
-  ]);
+  // const [items, setItems] = useState<SaleItem[]>([
+  //   {
+  //     id: crypto.randomUUID(),
+  //     quantity: 1,
+  //     description: '',
+  //     price: 0,
+  //   },
+  // ]);
+
+  const [items, setItems] = useState<SaleItem[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        setItems(JSON.parse(saved));
+      } catch (error) {
+        toast.error('Failed to load saved items. Starting with an empty list.');
+      }
+    } else {
+      setItems([]);
+    }
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (isHydrated) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+  }, [items, isHydrated]);
 
   const addItem = (item: Omit<SaleItem, 'id'>) => {
     const newItem = {
@@ -42,5 +68,6 @@ export const useSaleNote = () => {
     addItem,
     updateItem,
     removeItem,
+    isHydrated,
   };
 };

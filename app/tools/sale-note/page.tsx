@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import NextLink from "next/link";
-import { ArrowLeft, Printer, Plus, Trash2, Receipt, Box, X, Edit2 } from "lucide-react";
+import { ArrowLeft, Printer, Plus, Trash2, Receipt, Box, X, Edit2, Trash } from "lucide-react";
 import { useSaleNote } from "./hooks/use-sale-note";
 import { SaleItem } from "./types";
 
 export default function SaleNote() {
-    const { items, total, addItem, updateItem, removeItem, isHydrated } = useSaleNote();
+    const { items, total, addItem, updateItem, removeItem, isHydrated, clearNote } = useSaleNote();
     const [client, setClient] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -192,6 +192,13 @@ export default function SaleNote() {
                     title="Agregar artículo"
                 >
                     <Plus className="h-8 w-8" />
+                </button>
+                <button
+                    onClick={clearNote}
+                    className="h-14 w-14 rounded-full bg-destructive text-primary-foreground shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all outline-none focus:ring-4 focus:ring-primary/20"
+                    title="Limpiar nota"
+                >
+                    <Trash className="h-8 w-8" />
                 </button>
                 <button
                     onClick={handlePrint}

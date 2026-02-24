@@ -5,17 +5,17 @@ import { toast } from 'sonner';
 const STORAGE_KEY = 'sale-note-items';
 
 export const useSaleNote = () => {
-  // const [items, setItems] = useState<SaleItem[]>([
-  //   {
-  //     id: crypto.randomUUID(),
-  //     quantity: 1,
-  //     description: '',
-  //     price: 0,
-  //   },
-  // ]);
-
   const [items, setItems] = useState<SaleItem[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
+  
+  const initialState: SaleItem[] = [
+    {
+      id: crypto.randomUUID(),
+      quantity: 1,
+      description: '',
+      price: 0,
+    },
+  ];
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -26,7 +26,9 @@ export const useSaleNote = () => {
         toast.error('Failed to load saved items. Starting with an empty list.');
       }
     } else {
-      setItems([]);
+      setItems(
+        initialState
+      );
     }
     setIsHydrated(true);
   }, []);
@@ -58,6 +60,10 @@ export const useSaleNote = () => {
     }
   };
 
+  const clearNote = () => {
+    setItems(initialState);
+  };
+
   const total = useMemo(() => {
     return items.reduce((acc, item) => acc + item.quantity * item.price, 0);
   }, [items]);
@@ -69,5 +75,6 @@ export const useSaleNote = () => {
     updateItem,
     removeItem,
     isHydrated,
+    clearNote
   };
 };

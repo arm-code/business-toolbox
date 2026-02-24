@@ -3,59 +3,43 @@
 import { useState, useEffect } from "react";
 import NextLink from "next/link";
 import { ArrowLeft, Printer, Plus, Trash2, Receipt, Box, X, Edit2 } from "lucide-react";
-
-interface Item {
-    id: number;
-    quantity: number;
-    description: string;
-    price: number;
-}
+import { useSaleNote } from "./hooks/use-sale-note";
+import { SaleItem } from "./types";
 
 export default function SaleNote() {
+    const { items, total, addItem, updateItem, removeItem } = useSaleNote();
     const [client, setClient] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-    const [items, setItems] = useState<Item[]>([
-        { id: 1, quantity: 1, description: "", price: 0 },
-    ]);
-
-    // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<Item | null>(null);
+    const [editingItem, setEditingItem] = useState<SaleItem | null>(null);
 
+    // Logica para abrir el modal de agregar o editar artículo
     const openAddItem = () => {
-        setEditingItem({ id: Date.now(), quantity: 1, description: "", price: 0 });
+        setEditingItem({ id: "", quantity: 1, description: "", price: 0 });
         setIsModalOpen(true);
     };
 
-    const openEditItem = (item: Item) => {
+    const openEditItem = (item: SaleItem) => {
         setEditingItem({ ...item });
         setIsModalOpen(true);
     };
 
+    // Puente entre el modal y el hook para guardar o actualizar un artículo
     const saveItem = () => {
         if (!editingItem) return;
 
-        const exists = items.find(i => i.id === editingItem.id);
-        if (exists) {
-            setItems(items.map(i => i.id === editingItem.id ? editingItem : i));
+        if (editingItem.id) {
+            // Si tiene Id, es una actualización
+            updateItem(editingItem.id, editingItem)
         } else {
-            setItems([...items, editingItem]);
+            // Si no tiene Id, es un nuevo registro
+            addItem(editingItem)
         }
+
         setIsModalOpen(false);
         setEditingItem(null);
-    };
 
-    const removeItem = (id: number) => {
-        if (items.length > 1) {
-            setItems(items.filter((item) => item.id !== id));
-        }
-    };
-
-    const calculateSubtotal = () => {
-        return items.reduce((acc, item) => acc + item.quantity * item.price, 0);
-    };
-
-    const total = calculateSubtotal();
+    }
 
     const handlePrint = () => {
         window.print();

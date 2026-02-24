@@ -164,8 +164,15 @@ export default function SaleNote() {
                         </div>
                     </div>
 
+
                     {/* Totals */}
-                    <div className="flex justify-end pt-4 border-t-2 border-primary/20">
+                    {/* TODO:
+                    
+                        - agregar alineacion a la derecha para dispositivos grandes
+                        - alineacion a la izquierda en mobiles, ya que los botones de editar y eliminar se encuentran debajo de cada item
+                        - por alguna razon no funciona la configuracion actual de tailwind para esto, revisar y corregir
+                    */}
+                    <div className="flex justify-start md:justify-end pt-4 border-t-2 border-primary/20">
                         <div className="w-full max-w-[200px] space-y-2">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-muted-foreground font-medium">Subtotal</span>

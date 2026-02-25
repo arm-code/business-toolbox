@@ -9,6 +9,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import ItemModal from "./components/item-modal";
 import { toast } from "sonner";
 import { SaleNoteTicket } from "./components/sale-note-ticket";
+import { SaleNoteActions } from "./components/sale-note-actions";
 
 export default function SaleNote() {
     const { items, total, addItem, updateItem, removeItem, isHydrated, clearNote } = useSaleNote();
@@ -58,7 +59,7 @@ export default function SaleNote() {
     }
 
     return (
-        <div className="min-h-screen bg-background flex flex-col">
+        <div className="min-h-screen bg-slate-50 flex flex-col pb-24 md:pb-8">
             {/* Navigation - Hidden on Print */}
             <header className="print:hidden px-4 lg:px-6 h-16 flex items-center border-b bg-card sticky top-0 z-50">
                 <NextLink className="flex items-center justify-center text-sm font-medium" href="/catalog">
@@ -71,7 +72,7 @@ export default function SaleNote() {
                 </div>
             </header>
 
-            <main className="flex-1 p-4 md:p-8 flex justify-center">
+            <main className="flex-1 p-4 md:p-8 flex flex-col items-center">
                 <SaleNoteTicket
                     client={client}
                     setClient={setClient}
@@ -82,31 +83,24 @@ export default function SaleNote() {
                     onEditItem={openEditItem}
                     onRemoveItem={removeItem}
                 />
+
+                <div className="hidden md:block w-full max-w-2xl mt-6">
+                    <SaleNoteActions
+                        onAdd={openAddItem}
+                        onClear={clearNote}
+                        onPrint={handlePrint}
+                    />
+                </div>
             </main>
 
             {/* Global Actions - Unified Position */}
-            <div className="fixed bottom-6 right-6 print:hidden flex flex-col gap-3 z-40">
-                <button
-                    onClick={openAddItem}
-                    className="h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all outline-none focus:ring-4 focus:ring-primary/20"
-                    title="Agregar artículo"
-                >
-                    <Plus className="h-8 w-8" />
-                </button>
-                <button
-                    onClick={clearNote}
-                    className="h-14 w-14 rounded-full bg-destructive text-primary-foreground shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all outline-none focus:ring-4 focus:ring-primary/20"
-                    title="Limpiar nota"
-                >
-                    <Trash className="h-8 w-8" />
-                </button>
-                <button
-                    onClick={handlePrint}
-                    className="h-14 w-14 rounded-full bg-white text-primary border-2 border-primary shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all outline-none focus:ring-4 focus:ring-primary/20"
-                    title="Imprimir nota"
-                >
-                    <Printer className="h-6 w-6" />
-                </button>
+            {/* En mobile aparecerá fijo abajo */}
+            <div className="md:hidden">
+                <SaleNoteActions
+                    onAdd={openAddItem}
+                    onClear={clearNote}
+                    onPrint={handlePrint}
+                />
             </div>
 
             {/* Unified Modal Overlay */}

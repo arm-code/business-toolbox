@@ -8,6 +8,7 @@ import { SaleItem } from "./types";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import ItemModal from "./components/item-modal";
 import { toast } from "sonner";
+import { SaleNoteTicket } from "./components/sale-note-ticket";
 
 export default function SaleNote() {
     const { items, total, addItem, updateItem, removeItem, isHydrated, clearNote } = useSaleNote();
@@ -29,7 +30,7 @@ export default function SaleNote() {
 
     // Puente entre el modal y el hook para guardar o actualizar un artículo
     const saveItem = (itemToSave: SaleItem) => {
-        
+
 
         if (itemToSave.id) {
             // Si tiene Id, es una actualización
@@ -71,128 +72,16 @@ export default function SaleNote() {
             </header>
 
             <main className="flex-1 p-4 md:p-8 flex justify-center">
-                <div className="w-full max-w-2xl bg-white print:shadow-none print:border-none border shadow-sm rounded-xl p-6 md:p-10 transition-all">
-
-                    {/* Header of Note */}
-                    <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                        <div className="">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Box className="h-6 w-6 text-primary" />
-                                <h1 className="text-2xl font-bold tracking-tighter text-primary">BUSINESS TOOLBOX</h1>
-                            </div>
-                            <p className="text-xs text-violet-900 uppercase font-bold text-center">Nota de Venta</p>
-                        </div>
-                        <div className="text-right w-full md:w-auto bg-violet-50 p-2 rounded-lg">
-                            <div className="flex flex-col gap-1">
-                                <label className="text-[10px] uppercase text-muted-foreground font-bold">Fecha</label>
-                                <input
-                                    type="date"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    className="bg-transparent text-right outline-none border-none p-0 h-auto font-medium"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Client Info */}
-                    <div className="mb-8 p-4 bg-violet-50 rounded-lg">
-                        <label className="text-[10px] uppercase text-muted-foreground font-bold mb-1 block">Cliente / Concepto</label>
-                        <input
-                            type="text"
-                            placeholder="Nombre del cliente o nota adicional..."
-                            value={client}
-                            onChange={(e) => setClient(e.target.value.toUpperCase())}
-                            className="w-full bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground/50 font-medium"
-                        />
-                    </div>
-
-                    {/* Items Section - Web View (Unified Cards) */}
-                    <div className="print:hidden mb-8">
-                        <div className="flex justify-between items-center mb-4 px-2">
-                            <label className="text-[10px] uppercase text-muted-foreground font-bold block">Artículos</label>
-                            <span className="text-[10px] text-muted-foreground font-medium">{items.length} {items.length === 1 ? 'ítem' : 'ítems'}</span>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {items.map((item) => (
-                                <div key={item.id} className="p-4 border rounded-xl bg-card shadow-sm hover:border-primary/30 transition-all space-y-3 relative group">
-                                    <div className="flex justify-between items-start">
-                                        <div className="flex-1">
-                                            <p className="text-sm font-bold overflow-clip truncate max-w-[150px] text-ellipsis">{item.description.toUpperCase() || "Sin descripción"}</p>
-                                            <p className="text-xs text-muted-foreground">{item.quantity} x ${item.price.toFixed(2)}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-sm font-bold text-primary">${(item.quantity * item.price).toFixed(2)}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-2 pt-2 border-t">
-                                        <button
-                                            onClick={() => openEditItem(item)}
-                                            className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] font-bold uppercase bg-primary/5 text-primary rounded-lg hover:bg-primary/10 transition-colors"
-                                        >
-                                            <Edit2 className="h-3 w-3" /> Editar
-                                        </button>
-                                        <button
-                                            onClick={() => removeItem(item.id)}
-                                            className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] font-bold uppercase bg-destructive/5 text-destructive rounded-lg hover:bg-destructive/10 transition-colors"
-                                        >
-                                            <Trash2 className="h-3 w-3" /> Quitar
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Items Section - Print View (Table) */}
-                    <div className="hidden print:block mb-8">
-                        <div className="grid grid-cols-[50px_1fr_80px_100px] gap-2 border-b-2 border-primary/20 pb-2 mb-2 text-[10px] uppercase font-bold text-muted-foreground px-2">
-                            <div>Cant.</div>
-                            <div>Descripción</div>
-                            <div className="text-right">Precio</div>
-                            <div className="text-right">Importe</div>
-                        </div>
-
-                        <div className="space-y-1">
-                            {items.map((item) => (
-                                <div key={item.id} className="grid grid-cols-[50px_1fr_80px_100px] gap-2 items-center px-2 py-1 border-b border-muted/20">
-                                    <div className="text-sm">{item.quantity}</div>
-                                    <div className="text-sm">{item.description}</div>
-                                    <div className="text-sm text-right font-medium">${item.price.toFixed(2)}</div>
-                                    <div className="text-sm text-right font-bold text-primary">
-                                        ${(item.quantity * item.price).toFixed(2)}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-
-                    {/* Totals */}
-                    {/* TODO:
-                    
-                        - agregar alineacion a la derecha para dispositivos grandes
-                        - alineacion a la izquierda en mobiles, ya que los botones de editar y eliminar se encuentran debajo de cada item
-                        - por alguna razon no funciona la configuracion actual de tailwind para esto, revisar y corregir
-                    */}
-                    <div className="flex justify-start md:justify-end pt-4 border-t-2 border-primary/20">
-                        <div className="w-full max-w-[200px] space-y-2">
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-muted-foreground font-medium">Subtotal</span>
-                                <span>${total.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-lg font-bold text-primary">
-                                <span>TOTAL</span>
-                                <span>${total.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-12 text-center text-[10px] text-muted-foreground border-t pt-4">
-                        Gracias por su preferencia • Generado por business-toolbox
-                    </div>
-                </div>
+                <SaleNoteTicket
+                    client={client}
+                    setClient={setClient}
+                    date={date}
+                    setDate={setDate}
+                    items={items}
+                    total={total}
+                    onEditItem={openEditItem}
+                    onRemoveItem={removeItem}
+                />
             </main>
 
             {/* Global Actions - Unified Position */}
@@ -229,21 +118,6 @@ export default function SaleNote() {
                     item={editingItem}
                 />
             )}
-
-            <style jsx global>{`
-                @media print {
-                    body {
-                        background: white !important;
-                        padding: 0 !important;
-                    }
-                    .min-h-screen {
-                        min-height: auto !important;
-                    }
-                    main {
-                        padding: 0 !important;
-                    }
-                }
-            `}</style>
         </div>
     );
 }

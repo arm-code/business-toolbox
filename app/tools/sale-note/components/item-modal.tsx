@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 
 interface ItemModalProps {
     isOpen: boolean;
@@ -24,11 +25,23 @@ const ItemModal = ({ isOpen, onClose, onSave, item }: ItemModalProps) => {
 
 
     const handleSave = () => {
-        if (formData) {
-            onSave(formData)
-            onClose()
-        }
+    if (!formData) return;
+
+    // Diagnóstico Primero: ¿Los datos son válidos?
+    if (!formData.description.trim()) {
+        toast.error("La descripción no puede estar vacía");
+        return;
     }
+
+    if (formData.quantity <= 0) {
+        toast.error("La cantidad debe ser mayor a 0");
+        return;
+    }
+
+    // Si pasa las reglas de negocio, guardamos
+    onSave(formData);
+    onClose();
+};
 
     if (!formData) return null
 
@@ -47,6 +60,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item }: ItemModalProps) => {
                             id='description'
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            className='uppercase'
                         />
 
                     </div>

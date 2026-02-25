@@ -7,6 +7,7 @@ import { useSaleNote } from "./hooks/use-sale-note";
 import { SaleItem } from "./types";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import ItemModal from "./components/item-modal";
+import { toast } from "sonner";
 
 export default function SaleNote() {
     const { items, total, addItem, updateItem, removeItem, isHydrated, clearNote } = useSaleNote();
@@ -27,19 +28,20 @@ export default function SaleNote() {
     };
 
     // Puente entre el modal y el hook para guardar o actualizar un artículo
-    const saveItem = () => {
-        if (!editingItem) return;
+    const saveItem = (itemToSave: SaleItem) => {
+        
 
-        if (editingItem.id) {
+        if (itemToSave.id) {
             // Si tiene Id, es una actualización
-            updateItem(editingItem.id, editingItem)
+            updateItem(itemToSave.id, itemToSave)
         } else {
             // Si no tiene Id, es un nuevo registro
-            addItem(editingItem)
+            addItem(itemToSave)
         }
 
         setIsModalOpen(false);
         setEditingItem(null);
+        toast.success('Articulo guardado correctamente.')
 
     }
 

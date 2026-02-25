@@ -20,7 +20,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item }: ItemModalProps) => {
 
     useEffect(() => {
         if (item) setFormData(item)
-    }, [item])
+    }, [item, isOpen])
 
 
     const handleSave = () => {
@@ -55,6 +55,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item }: ItemModalProps) => {
                         <Label>Cantidad</Label>
                         <Input
                             id='quantity'
+                            type='number'
                             value={formData.quantity}
                             onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
                         />
@@ -63,6 +64,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item }: ItemModalProps) => {
                         <Label htmlFor=''>Precio Unitario</Label>
                         <Input
                             id='price'
+                            type='number'
                             value={formData.price}
                             onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
 

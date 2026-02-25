@@ -5,6 +5,7 @@ import NextLink from "next/link";
 import { ArrowLeft, Printer, Plus, Trash2, Receipt, Box, X, Edit2, Trash } from "lucide-react";
 import { useSaleNote } from "./hooks/use-sale-note";
 import { SaleItem } from "./types";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export default function SaleNote() {
     const { items, total, addItem, updateItem, removeItem, isHydrated, clearNote } = useSaleNote();
@@ -218,8 +219,9 @@ export default function SaleNote() {
 
             {/* Unified Modal Overlay */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-100 animate-in fade-in duration-200 backdrop-blur-sm">
-                    <div className="bg-background w-full max-w-lg rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
+                <Dialog >
+                    <DialogContent>
+                        
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-lg font-bold tracking-tighter uppercase">{editingItem && items.find(i => i.id === editingItem.id) ? "Editar Artículo" : "Agregar Artículo"}</h2>
                             <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-muted rounded-full transition-colors">
@@ -266,8 +268,8 @@ export default function SaleNote() {
                                 {editingItem && items.find(i => i.id === editingItem.id) ? "Actualizar Artículo" : "Guardar Artículo"}
                             </button>
                         </div>
-                    </div>
-                </div>
+                    </DialogContent>
+                </Dialog>
             )}
 
             <style jsx global>{`

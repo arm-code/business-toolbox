@@ -6,6 +6,7 @@ import { ArrowLeft, Printer, Plus, Trash2, Receipt, Box, X, Edit2, Trash } from 
 import { useSaleNote } from "./hooks/use-sale-note";
 import { SaleItem } from "./types";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import ItemModal from "./components/item-modal";
 
 export default function SaleNote() {
     const { items, total, addItem, updateItem, removeItem, isHydrated, clearNote } = useSaleNote();
@@ -219,57 +220,12 @@ export default function SaleNote() {
 
             {/* Unified Modal Overlay */}
             {isModalOpen && (
-                <Dialog >
-                    <DialogContent>
-                        
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-lg font-bold tracking-tighter uppercase">{editingItem && items.find(i => i.id === editingItem.id) ? "Editar Artículo" : "Agregar Artículo"}</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-muted rounded-full transition-colors">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-
-                        <div className="space-y-5">
-                            <div>
-                                <label className="text-[10px] uppercase font-bold text-muted-foreground mb-1 block px-1">Descripción</label>
-                                <input
-                                    type="text"
-                                    placeholder="Nombre del producto o servicio"
-                                    value={editingItem?.description || ""}
-                                    onChange={(e) => setEditingItem(prev => prev ? { ...prev, description: e.target.value } : null)}
-                                    className="w-full bg-muted/30 border rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-[10px] uppercase font-bold text-muted-foreground mb-1 block px-1">Cantidad</label>
-                                    <input
-                                        type="number"
-                                        value={editingItem?.quantity || ""}
-                                        onChange={(e) => setEditingItem(prev => prev ? { ...prev, quantity: parseFloat(e.target.value) || 0 } : null)}
-                                        className="w-full bg-muted/30 border rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-[10px] uppercase font-bold text-muted-foreground mb-1 block px-1">Precio Unitario</label>
-                                    <input
-                                        type="number"
-                                        value={editingItem?.price || ""}
-                                        onChange={(e) => setEditingItem(prev => prev ? { ...prev, price: parseFloat(e.target.value) || 0 } : null)}
-                                        className="w-full bg-muted/30 border rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                                    />
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={saveItem}
-                                className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold uppercase tracking-widest text-sm shadow-xl hover:opacity-90 active:scale-[0.98] transition-all mt-6"
-                            >
-                                {editingItem && items.find(i => i.id === editingItem.id) ? "Actualizar Artículo" : "Guardar Artículo"}
-                            </button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                <ItemModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSave={saveItem}
+                    item={editingItem}
+                />
             )}
 
             <style jsx global>{`

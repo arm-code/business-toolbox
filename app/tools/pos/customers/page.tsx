@@ -16,9 +16,9 @@ import {
     CheckCircle2,
     DollarSign
 } from "lucide-react";
-import { apiFetch } from "../../../lib/api";
+import { apiFetch } from "../../../../lib/api";
 import { Customer } from "../../../types/pos";
-import Toast, { ToastType } from "../../../components/Toast";
+import Toast, { ToastType } from "../../../../components/Toast";
 
 export default function CustomersPage() {
     const [customers, setCustomers] = useState<Customer[]>([]);

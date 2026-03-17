@@ -19,9 +19,9 @@ import {
     ArrowRight,
     Sparkles
 } from "lucide-react";
-import { apiFetch } from "../../../lib/api";
+import { apiFetch } from "../../../../lib/api";
 import { CashClosingReport, NetProfitReport, SaleHistoryItem, Shift, User, ShiftExpensesReport, Expense } from "../../../types/pos";
-import Toast, { ToastType } from "../../../components/Toast";
+import Toast, { ToastType } from "../../../../components/Toast";
 
 export default function ReportsPage() {
     const [user, setUser] = useState<User | null>(null);

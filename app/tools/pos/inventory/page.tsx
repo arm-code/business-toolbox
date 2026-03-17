@@ -18,9 +18,9 @@ import {
     AlertCircle,
     Sparkles
 } from "lucide-react";
-import { apiFetch } from "../../../lib/api";
+import { apiFetch } from "../../../../lib/api";
 import { Product, Category, User } from "../../../types/pos";
-import Toast, { ToastType } from "../../../components/Toast";
+import Toast, { ToastType } from "../../../../components/Toast";
 
 export default function InventoryPage() {
     const [products, setProducts] = useState<Product[]>([]);

@@ -17,9 +17,9 @@ import {
     History,
     Sparkles
 } from "lucide-react";
-import { apiFetch } from "../../../lib/api";
+import { apiFetch } from "../../../../lib/api";
 import { Shift, Expense, User } from "../../../types/pos";
-import Toast, { ToastType } from "../../../components/Toast";
+import Toast, { ToastType } from "../../../../components/Toast";
 
 export default function FinancePage() {
     const [activeShift, setActiveShift] = useState<Shift | null>(null);

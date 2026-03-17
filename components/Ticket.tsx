@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { SaleHistoryItem } from '../types/pos';
+import { SaleHistoryItem } from '../app/types/pos';
 
 interface TicketProps {
     sale: SaleHistoryItem | null;

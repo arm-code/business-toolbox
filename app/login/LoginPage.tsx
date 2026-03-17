@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Mail, Lock, Loader2, ArrowRight, Sparkles } from "lucide-react";
-import { apiFetch } from "../lib/api";
+import { apiFetch } from "../../lib/api";
 import { AuthResponse } from "../types/pos";
-import Toast, { ToastType } from "../components/Toast";
+import Toast, { ToastType } from "../../components/Toast";
 
 export default function LoginPage() {
     const router = useRouter();

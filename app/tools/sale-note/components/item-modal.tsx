@@ -16,39 +16,45 @@ interface ItemModalProps {
 
 
 const ItemModal = ({ isOpen, onClose, onSave, item }: ItemModalProps) => {
-
     const [formData, setFormData] = useState<SaleItem | null>(null);
 
+    // Sincronización de estado
     useEffect(() => {
-        if (item) setFormData(item)
-    }, [item, isOpen])
-
+        if (isOpen) {
+            setFormData(item);
+        } else {
+            // Limpiamos al cerrar para evitar fugas de datos visuales
+            setFormData(null);
+        }
+    }, [item, isOpen]);
 
     const handleSave = () => {
-    if (!formData) return;
+        if (!formData) return;
 
-    // Diagnóstico Primero: ¿Los datos son válidos?
-    if (!formData.description.trim()) {
-        toast.error("La descripción no puede estar vacía");
-        return;
-    }
+        // Validación de reglas de negocio
+        if (!formData.description.trim()) {
+            toast.error("La descripción no puede estar vacía");
+            return;
+        }
 
-    if (formData.quantity <= 0) {
-        toast.error("La cantidad debe ser mayor a 0");
-        return;
-    }
+        // Aseguramos que los valores sean números reales antes de guardar
+        const quantity = Number(formData.quantity);
+        const price = Number(formData.price);
 
-    // Si pasa las reglas de negocio, guardamos
-    onSave(formData);
-    onClose();
-};
+        if (isNaN(quantity) || quantity <= 0) {
+            toast.error("La cantidad debe ser un número mayor a 0");
+            return;
+        }
 
-    if (!formData) return null
+        onSave({ ...formData, quantity, price });
+        onClose();
+    };
+
+    if (!formData) return null;
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose} >
-            <DialogContent>
-
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>{formData.id ? "Editar Artículo" : "Agregar Artículo"}</DialogTitle>
                 </DialogHeader>
@@ -60,44 +66,48 @@ const ItemModal = ({ isOpen, onClose, onSave, item }: ItemModalProps) => {
                             id='description'
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className='uppercase'
-                        />
-
-                    </div>
-
-                    <div className='grid gap-2'>
-                        <Label>Cantidad</Label>
-                        <Input
-                            id='quantity'
-                            type='number'
-                            value={formData.quantity}
-                            onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
+                            className='uppercase font-semibold'
+                            placeholder="Ej. MESA GRANDE CON 8 SILLAS"
+                            onFocus={(e) => e.target.select()}
+                            autoComplete="off"
                         />
                     </div>
-                    <div className='grid gap-2'>
-                        <Label htmlFor=''>Precio Unitario</Label>
-                        <Input
-                            id='price'
-                            type='number'
-                            value={formData.price}
-                            onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
 
-                        />
+                    <div className='grid grid-cols-2 gap-4'>
+                        <div className='grid gap-2'>
+                            <Label htmlFor='quantity'>Cantidad</Label>
+                            <Input
+                                id='quantity'
+                                type='number'
+                                // Si es 0, lo mostramos vacío para facilitar la edición
+                                value={formData.quantity === 0 ? "" : formData.quantity}
+                                onChange={(e) => setFormData({ ...formData, quantity: e.target.value === "" ? 0 : Number(e.target.value) })}
+                                onFocus={(e) => e.target.select()}
+                                step="any"
+                            />
+                        </div>
+                        <div className='grid gap-2'>
+                            <Label htmlFor='price'>Precio Unitario</Label>
+                            <Input
+                                id='price'
+                                type='number'
+                                value={formData.price === 0 ? "" : formData.price}
+                                onChange={(e) => setFormData({ ...formData, price: e.target.value === "" ? 0 : Number(e.target.value) })}
+                                onFocus={(e) => e.target.select()}
+                                step="any"
+                            />
+                        </div>
                     </div>
                 </div>
 
                 <DialogFooter>
-                    <Button
-                        onClick={handleSave}
-                        className='w-full'
-                    >
-                        {formData.id ? "Actualizar" : "Guardar"}
+                    <Button onClick={handleSave} className='w-full text-lg h-12'>
+                        {formData.id ? "Actualizar Artículo" : "Añadir Artículo"}
                     </Button>
                 </DialogFooter>
-
             </DialogContent>
         </Dialog>
-    )
-}
+    );
+};
 
-export default ItemModal
+export default ItemModal;

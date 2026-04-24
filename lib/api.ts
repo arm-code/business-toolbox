@@ -1,4 +1,4 @@
-import { ApiResponse } from '../types/pos';
+import { ApiResponse } from '../app/types/pos';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 

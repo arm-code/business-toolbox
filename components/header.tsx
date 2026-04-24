@@ -44,10 +44,10 @@ export function Header() {
 
                 <div className="hidden items-center gap-3 md:flex">
                     <Button variant="ghost" asChild>
-                        <Link href="/login">Log in</Link>
+                        <Link href="/login">Ingresar</Link>
                     </Button>
                     <Button asChild>
-                        <Link href="/register">Get Started</Link>
+                        <Link href="/register">Registrarse</Link>
                     </Button>
                 </div>
 

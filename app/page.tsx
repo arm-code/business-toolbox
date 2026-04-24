@@ -90,21 +90,6 @@ const stats = [
 export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Header */}
-      <header className="px-4 lg:px-6 h-16 flex items-center border-b">
-        <Link className="flex items-center justify-center" href="#">
-          <Box className="h-6 w-6 text-primary" />
-          <span className="ml-2 font-bold text-xl tracking-tighter">Business Toolbox</span>
-        </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="/catalog">
-            Herramientas
-          </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
-            Precios
-          </Link>
-        </nav>
-      </header>
 
       <Header />
 

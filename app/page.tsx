@@ -1,40 +1,59 @@
-import Link from "next/link";
-import { ArrowRight, Box, Calculator, CreditCard, FileText, Receipt, Shield, ShoppingCart, Smartphone, Wallet, Zap } from "lucide-react";
-import { Header } from "@/components/header";
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Header } from "@/components/header"
+
+import {
+  ShoppingCart,
+  FileText,
+  Calculator,
+  Receipt,
+  Wallet,
+  ArrowRight,
+  CheckCircle2,
+  Star,
+  Users,
+  TrendingUp,
+  Zap,
+  Shield,
+  Smartphone,
+} from "lucide-react"
+import { ToolCard } from "@/components/tool-card"
+import { Footer } from "@/components/footer"
 
 const tools = [
   {
-    title: "Point of Sale",
-    description: "Register sales quickly, manage products, print tickets, and track your daily cash flow.",
+    title: "Punto de Venta",
+    description: "Registra ventas rápidamente, gestiona productos, imprime tickets y lleva el control de tu flujo de caja diario.",
     icon: ShoppingCart,
     href: "/tools/pos",
     badge: "Free" as const,
     featured: true,
   },
   {
-    title: "Sales Note Generator",
-    description: "Create quick sale notes and invoices from your phone or computer in seconds.",
+    title: "Generador de Notas de Venta",
+    description: "Crea notas de venta rápidas y facturas desde tu teléfono o computadora en segundos.",
     icon: Receipt,
     href: "/tools/sales-note",
     badge: "Free" as const,
   },
   {
-    title: "Quote Generator",
-    description: "Create professional quotations for your customers with your business branding.",
+    title: "Generador de Cotizaciones",
+    description: "Crea cotizaciones profesionales para tus clientes con la marca de tu negocio.",
     icon: FileText,
     href: "/tools/quotes",
     badge: "Free" as const,
   },
   {
-    title: "Financial Calculator",
-    description: "Calculate profit margins, taxes, break-even points, and installment payments.",
+    title: "Calculadora Financiera",
+    description: "Calcula márgenes de ganancia, impuestos, puntos de equilibrio y pagos a plazos.",
     icon: Calculator,
     href: "/tools/calculator",
     badge: "Free" as const,
   },
   {
-    title: "Expense Control",
-    description: "Track your daily expenses simply and stay on top of your business spending.",
+    title: "Control de Gastos",
+    description: "Registra tus gastos diarios de forma sencilla y mantén el control de los gastos de tu negocio.",
     icon: Wallet,
     href: "/tools/expenses",
     badge: "Premium" as const,
@@ -44,129 +63,241 @@ const tools = [
 const benefits = [
   {
     icon: Zap,
-    title: "Fast & Simple",
-    description: "Complete your most common tasks in just 1-2 taps. No training required.",
+    title: "Rápido y Sencillo",
+    description: "Realiza tus tareas más comunes en solo 1-2 toques. No requiere entrenamiento.",
   },
   {
     icon: Smartphone,
-    title: "Works Everywhere",
-    description: "Use on your phone, tablet, or computer. Your data syncs automatically.",
+    title: "Funciona en todos lados",
+    description: "Úsalo en tu teléfono, tablet o computadora. Tus datos se sincronizan automáticamente.",
   },
   {
     icon: Shield,
-    title: "Secure & Reliable",
-    description: "Your business data is protected with enterprise-grade security.",
+    title: "Seguro y Confiable",
+    description: "Tus datos comerciales están protegidos con seguridad de nivel empresarial.",
   },
 ]
 
 const testimonials = [
   {
-    quote: "Finally, software that understands small business. I started selling more the same day I installed it.",
+    quote: "Finalmente, software que entiende el pequeño negocio. Empecé a vender más el mismo día que lo instalé.",
     author: "Maria Garcia",
-    role: "Corner Store Owner",
+    role: "Dueña de tienda",
     rating: 5,
   },
   {
-    quote: "The quote generator saved me hours every week. My customers love the professional look.",
+    quote: "El generador de cotizaciones me ahorró horas cada semana. A mis clientes les encanta el aspecto profesional.",
     author: "Carlos Rodriguez",
-    role: "Plumber",
+    role: "Fontanero",
     rating: 5,
   },
   {
-    quote: "I can track everything from my phone while I&apos;m at the food stand. It just works.",
+    quote: "Puedo rastrear todo desde mi teléfono mientras estoy en el puesto de comida. Simplemente funciona.",
     author: "Ana Mendez",
-    role: "Food Vendor",
+    role: "Vendedora de comida",
     rating: 5,
   },
 ]
 
 const stats = [
-  { value: "10,000+", label: "Businesses" },
-  { value: "500K+", label: "Sales Processed" },
-  { value: "4.9/5", label: "User Rating" },
+  { value: "10,000+", label: "Negocios" },
+  { value: "500K+", label: "Ventas procesadas" },
+  { value: "4.9/5", label: "Valoración de usuarios" },
 ]
-
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col min-h-screen">
-
+    <div className="flex min-h-screen flex-col">
       <Header />
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 flex items-center justify-center">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                  Todo lo que tu pequeño negocio necesita para <span className="text-primary">Crecer </span>
-                </h1>
-                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                  Vende más rápido, ahorra tiempo y mantente organizado con herramientas de negocio sencillas, diseñadas para tiendas locales, puestos de comida y emprendedores como tú.
-                </p>
+        <section className="relative overflow-hidden border-b border-border">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
+          <div className="container mx-auto max-w-6xl px-4 py-20 md:py-32">
+            <div className="mx-auto max-w-3xl text-center">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+                <Zap className="h-4 w-4" />
+                Herramientas sencillas para negocios reales
               </div>
-              <div className="space-x-4">
-                <Link
-                  href="/catalog"
-                  className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                >
-                  Empezar ahora
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
+              <h1 className="text-balance text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
+                Todo lo que tu pequeño negocio necesita para{" "}
+                <span className="text-primary">crecer</span>
+              </h1>
+              <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-muted-foreground leading-relaxed md:text-xl">
+                Vende más rápido, ahorra tiempo y mantente organizado con herramientas comerciales simples
+                diseñadas para tiendas locales, puestos de comida y emprendedores como tú.
+              </p>
+              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                <Button size="lg" className="w-full gap-2 sm:w-auto" asChild>
+                  <Link href="/tools">
+                    Pruébalo gratis
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button variant="outline" size="lg" className="w-full sm:w-auto" asChild>
+                  <Link href="/register">Crear cuenta gratis</Link>
+                </Button>
+              </div>
+              <div className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-accent" />
+                  Sin tarjeta de crédito
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-accent" />
+                  Plan gratuito siempre
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-accent" />
+                  Configuración en minutos
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-accent" />
+                  Usa desde tu celular
+                </span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Features Preview */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/50 flex items-center justify-center">
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="flex flex-col items-center space-y-2 border p-6 rounded-xl bg-background shadow-sm hover:shadow-md transition-shadow">
-                <div className="p-3 rounded-full bg-primary/10">
-                  <CreditCard className="h-6 w-6 text-primary" />
+        {/* Stats Section */}
+        <section className="border-b border-border bg-card">
+          <div className="container mx-auto max-w-6xl px-4 py-12">
+            <div className="grid grid-cols-3 gap-8">
+              {stats.map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <div className="text-2xl font-bold text-primary md:text-3xl">{stat.value}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">{stat.label}</div>
                 </div>
-                <h3 className="text-xl font-bold">Ventas Rápidas</h3>
-                <p className="text-sm text-muted-foreground text-center">
-                  Genera notas de venta en segundos desde tu móvil o PC.
-                </p>
-              </div>
-              <div className="flex flex-col items-center space-y-2 border p-6 rounded-xl bg-background shadow-sm hover:shadow-md transition-shadow">
-                <div className="p-3 rounded-full bg-primary/10">
-                  <FileText className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold">Cotizaciones</h3>
-                <p className="text-sm text-muted-foreground text-center">
-                  Envía presupuestos profesionales de manera inmediata.
-                </p>
-              </div>
-              <div className="flex flex-col items-center space-y-2 border p-6 rounded-xl bg-background shadow-sm hover:shadow-md transition-shadow">
-                <div className="p-3 rounded-full bg-primary/10">
-                  <Zap className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold">Sin Instalación</h3>
-                <p className="text-sm text-muted-foreground text-center">
-                  Accede desde cualquier lugar como una aplicación instalada (PWA).
-                </p>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Tools Section */}
+        <section className="py-20 md:py-28">
+          <div className="container mx-auto max-w-6xl px-4">
+            <div className="mx-auto mb-12 max-w-2xl text-center">
+              <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">
+                Tu Caja de Herramientas para el Negocio
+              </h2>
+              <p className="mt-4 text-muted-foreground leading-relaxed">
+                Todo lo que necesitas para dirigir tu negocio, <span className="font-semibold">todo en un solo lugar</span>.
+                Empieza gratis y mejora cuando necesites más.
+              </p>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {tools.map((tool) => (
+                <ToolCard key={tool.title} {...tool} />
+              ))}
+            </div>
+            <div className="mt-12 text-center">
+              <Button variant="outline" size="lg" asChild>
+                <Link href="/tools" className="gap-2">
+                  Ver todas las herramientas
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Benefits Section */}
+        <section className="border-y border-border bg-card py-20 md:py-28">
+          <div className="container mx-auto max-w-6xl px-4">
+            <div className="mx-auto mb-12 max-w-2xl text-center">
+              <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">
+                Built for Busy Business Owners
+              </h2>
+              <p className="mt-4 text-muted-foreground leading-relaxed">
+                We understand you have limited time and patience for complicated software.
+                That&apos;s why we made everything ridiculously simple.
+              </p>
+            </div>
+            <div className="grid gap-8 md:grid-cols-3">
+              {benefits.map((benefit) => (
+                <Card key={benefit.title} className="border-0 bg-background shadow-none">
+                  <CardContent className="pt-6">
+                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <benefit.icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="mb-2 text-lg font-semibold">{benefit.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{benefit.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section className="py-20 md:py-28">
+          <div className="container mx-auto max-w-6xl px-4">
+            <div className="mx-auto mb-12 max-w-2xl text-center">
+              <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">
+                Loved by Small Business Owners
+              </h2>
+              <p className="mt-4 text-muted-foreground leading-relaxed">
+                Join thousands of entrepreneurs who transformed their daily operations.
+              </p>
+            </div>
+            <div className="grid gap-6 md:grid-cols-3">
+              {testimonials.map((testimonial, index) => (
+                <Card key={index} className="relative overflow-hidden">
+                  <CardContent className="pt-6">
+                    <div className="mb-4 flex gap-0.5">
+                      {Array.from({ length: testimonial.rating }).map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-primary text-primary" />
+                      ))}
+                    </div>
+                    <blockquote className="mb-6 text-foreground leading-relaxed">
+                      &ldquo;{testimonial.quote}&rdquo;
+                    </blockquote>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                        {testimonial.author.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="font-medium">{testimonial.author}</div>
+                        <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="border-t border-border bg-primary/5 py-20 md:py-28">
+          <div className="container mx-auto max-w-6xl px-4">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">
+                Ready to Simplify Your Business?
+              </h2>
+              <p className="mt-4 text-muted-foreground leading-relaxed">
+                Start using our free tools today. No credit card required, no complicated setup.
+                Just simple tools that help you sell more and stress less.
+              </p>
+              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                <Button size="lg" className="w-full gap-2 sm:w-auto" asChild>
+                  <Link href="/register">
+                    Get Started Free
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button variant="outline" size="lg" className="w-full sm:w-auto" asChild>
+                  <Link href="/tools">Explore Tools</Link>
+                </Button>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">© 2026 Business Toolbox. Todos los derechos reservados.</p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-xs hover:underline underline-offset-4" href="#">
-            Términos
-          </Link>
-          <Link className="text-xs hover:underline underline-offset-4" href="#">
-            Privacidad
-          </Link>
-        </nav>
-      </footer>
+      <Footer />
     </div>
-  );
+  )
 }

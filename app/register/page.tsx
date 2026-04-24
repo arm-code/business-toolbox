@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Mail, Lock, Loader2, ArrowRight, User, Phone, MapPin } from "lucide-react";
-import { apiFetch } from "../lib/api";
-import Toast, { ToastType } from "../components/Toast";
+import { apiFetch } from "../../lib/api";
+import Toast, { ToastType } from "../../components/Toast";
 
 export default function RegisterPage() {
     const router = useRouter();

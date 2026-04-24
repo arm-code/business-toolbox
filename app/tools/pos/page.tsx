@@ -22,10 +22,10 @@ import {
     Truck,
     Sparkles
 } from "lucide-react";
-import { apiFetch } from "../../lib/api";
+import { apiFetch } from "../../../lib/api";
 import { Product, Customer, PaymentMethod, CreateSaleDto, SaleHistoryItem, Shift, User } from "../../types/pos";
-import Toast, { ToastType } from "../../components/Toast";
-import Ticket from "../../components/Ticket";
+import Toast, { ToastType } from "../../../components/Toast";
+import Ticket from "../../../components/Ticket";
 
 export default function POSPage() {
     const [search, setSearch] = useState("");

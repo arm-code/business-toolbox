@@ -1,7 +1,93 @@
 import Link from "next/link";
-import { ArrowRight, Box, CreditCard, FileText, Zap } from "lucide-react";
+import { ArrowRight, Box, Calculator, CreditCard, FileText, Receipt, Shield, ShoppingCart, Smartphone, Wallet, Zap } from "lucide-react";
+import { Header } from "@/components/header";
 
-export default function Home() {
+const tools = [
+  {
+    title: "Point of Sale",
+    description: "Register sales quickly, manage products, print tickets, and track your daily cash flow.",
+    icon: ShoppingCart,
+    href: "/tools/pos",
+    badge: "Free" as const,
+    featured: true,
+  },
+  {
+    title: "Sales Note Generator",
+    description: "Create quick sale notes and invoices from your phone or computer in seconds.",
+    icon: Receipt,
+    href: "/tools/sales-note",
+    badge: "Free" as const,
+  },
+  {
+    title: "Quote Generator",
+    description: "Create professional quotations for your customers with your business branding.",
+    icon: FileText,
+    href: "/tools/quotes",
+    badge: "Free" as const,
+  },
+  {
+    title: "Financial Calculator",
+    description: "Calculate profit margins, taxes, break-even points, and installment payments.",
+    icon: Calculator,
+    href: "/tools/calculator",
+    badge: "Free" as const,
+  },
+  {
+    title: "Expense Control",
+    description: "Track your daily expenses simply and stay on top of your business spending.",
+    icon: Wallet,
+    href: "/tools/expenses",
+    badge: "Premium" as const,
+  },
+]
+
+const benefits = [
+  {
+    icon: Zap,
+    title: "Fast & Simple",
+    description: "Complete your most common tasks in just 1-2 taps. No training required.",
+  },
+  {
+    icon: Smartphone,
+    title: "Works Everywhere",
+    description: "Use on your phone, tablet, or computer. Your data syncs automatically.",
+  },
+  {
+    icon: Shield,
+    title: "Secure & Reliable",
+    description: "Your business data is protected with enterprise-grade security.",
+  },
+]
+
+const testimonials = [
+  {
+    quote: "Finally, software that understands small business. I started selling more the same day I installed it.",
+    author: "Maria Garcia",
+    role: "Corner Store Owner",
+    rating: 5,
+  },
+  {
+    quote: "The quote generator saved me hours every week. My customers love the professional look.",
+    author: "Carlos Rodriguez",
+    role: "Plumber",
+    rating: 5,
+  },
+  {
+    quote: "I can track everything from my phone while I&apos;m at the food stand. It just works.",
+    author: "Ana Mendez",
+    role: "Food Vendor",
+    rating: 5,
+  },
+]
+
+const stats = [
+  { value: "10,000+", label: "Businesses" },
+  { value: "500K+", label: "Sales Processed" },
+  { value: "4.9/5", label: "User Rating" },
+]
+
+
+export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
@@ -20,6 +106,8 @@ export default function Home() {
         </nav>
       </header>
 
+      <Header />
+
       <main className="flex-1">
         {/* Hero Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 flex items-center justify-center">
@@ -27,10 +115,10 @@ export default function Home() {
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                  Herramientas Simples para <span className="text-primary italic">Pequeños Negocios</span>
+                  Todo lo que tu pequeño negocio necesita para <span className="text-primary">Crecer </span>
                 </h1>
                 <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                  Cotizaciones, ventas y notas en segundos. Sin complicaciones, directo al grano.
+                  Vende más rápido, ahorra tiempo y mantente organizado con herramientas de negocio sencillas, diseñadas para tiendas locales, puestos de comida y emprendedores como tú.
                 </p>
               </div>
               <div className="space-x-4">

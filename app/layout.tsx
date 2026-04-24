@@ -1,32 +1,18 @@
-import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
-import "./globals.css";
-import { Toaster } from "sonner";
+import type { Metadata } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+
+import './globals.css'
+import { Toaster } from 'sonner';
 
 
-// configuracion de fuentes
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
 
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-});
+const _geist = Geist({ subsets: ["latin"] });
+const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Business Toolbox",
-  description: "Simple business tools for invoicing, quotes, and expenses.",
+  title: 'ARM Solutions - Herramientas de Negocio Sencillas para Pequeñas Empresas',
+  description: 'Tu caja de herramientas para el negocio: Punto de Venta, facturas, cotizaciones, control de gastos y más. Herramientas sencillas y accesibles diseñadas para pequeñas empresas, tiendas locales y emprendedores.',
   manifest: "/manifest.json",
-};
-
-export const viewport: Viewport = {
-  themeColor: "#7c3aed",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -36,9 +22,13 @@ export default function RootLayout({
 }
 ) {
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html
+      lang="es"
+      suppressHydrationWarning
+      className="bg-background"
+    >
       <body
-        className={`${inter.variable} ${mono.variable} font-sans antialiased`}
+        className="font-sans antialiased"
       >
         <Toaster richColors closeButton position="bottom-right" />
         {children}

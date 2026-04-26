@@ -208,11 +208,11 @@ export default function HomePage() {
           <div className="container mx-auto max-w-6xl px-4">
             <div className="mx-auto mb-12 max-w-2xl text-center">
               <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">
-                Built for Busy Business Owners
+                Diseñado para dueños de negocios ocupados
               </h2>
               <p className="mt-4 text-muted-foreground leading-relaxed">
-                We understand you have limited time and patience for complicated software.
-                That&apos;s why we made everything ridiculously simple.
+                Entendemos que tienes tiempo y paciencia limitados para software complicado.
+                Por eso hicimos todo ridículamente simple.
               </p>
             </div>
             <div className="grid gap-8 md:grid-cols-3">
@@ -236,10 +236,10 @@ export default function HomePage() {
           <div className="container mx-auto max-w-6xl px-4">
             <div className="mx-auto mb-12 max-w-2xl text-center">
               <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">
-                Loved by Small Business Owners
+                Amado por dueños de pequeños negocios
               </h2>
               <p className="mt-4 text-muted-foreground leading-relaxed">
-                Join thousands of entrepreneurs who transformed their daily operations.
+                Únete a miles de emprendedores que transformaron sus operaciones diarias.
               </p>
             </div>
             <div className="grid gap-6 md:grid-cols-3">
@@ -275,21 +275,21 @@ export default function HomePage() {
           <div className="container mx-auto max-w-6xl px-4">
             <div className="mx-auto max-w-2xl text-center">
               <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">
-                Ready to Simplify Your Business?
+                ¿Listo para simplificar tu negocio?
               </h2>
               <p className="mt-4 text-muted-foreground leading-relaxed">
-                Start using our free tools today. No credit card required, no complicated setup.
-                Just simple tools that help you sell more and stress less.
+                Empieza a usar nuestras herramientas gratuitas hoy mismo. Sin tarjeta de crédito, sin configuración complicada.
+                Solo herramientas simples que te ayudan a vender más y estresarte menos.
               </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Button size="lg" className="w-full gap-2 sm:w-auto" asChild>
                   <Link href="/register">
-                    Get Started Free
+                    Empezar gratis
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
                 <Button variant="outline" size="lg" className="w-full sm:w-auto" asChild>
-                  <Link href="/tools">Explore Tools</Link>
+                  <Link href="/tools">Explorar herramientas</Link>
                 </Button>
               </div>
             </div>

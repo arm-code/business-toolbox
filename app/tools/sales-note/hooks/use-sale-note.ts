@@ -2,10 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { SaleItem } from '../types';
 import { toast } from 'sonner';
 
-const STORAGE_KEY = 'sale-note-items';
+const ITEMS_STORAGE_KEY = 'sale-note-items';
+const BUSINESS_NAME_STORAGE_KEY = 'sale-note-business-name';
+const DEFAULT_BUSINESS_NAME = 'BUSINESS TOOLBOX';
 
 export const useSaleNote = () => {
   const [items, setItems] = useState<SaleItem[]>([]);
+  const [businessName, setBusinessName] = useState(DEFAULT_BUSINESS_NAME);
   const [isHydrated, setIsHydrated] = useState(false);
   
   const initialState: SaleItem[] = [
@@ -18,26 +21,33 @@ export const useSaleNote = () => {
   ];
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
+    const savedItems = localStorage.getItem(ITEMS_STORAGE_KEY);
+    const savedBusinessName = localStorage.getItem(BUSINESS_NAME_STORAGE_KEY);
+
+    if (savedItems) {
       try {
-        setItems(JSON.parse(saved));
+        setItems(JSON.parse(savedItems));
       } catch (error) {
         toast.error('Failed to load saved items. Starting with an empty list.');
+        setItems(initialState);
       }
     } else {
-      setItems(
-        initialState
-      );
+      setItems(initialState);
     }
+
+    if (savedBusinessName) {
+      setBusinessName(savedBusinessName);
+    }
+
     setIsHydrated(true);
   }, []);
 
   useEffect(() => {
     if (isHydrated) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      localStorage.setItem(ITEMS_STORAGE_KEY, JSON.stringify(items));
+      localStorage.setItem(BUSINESS_NAME_STORAGE_KEY, businessName);
     }
-  }, [items, isHydrated]);
+  }, [items, businessName, isHydrated]);
 
   const addItem = (item: Omit<SaleItem, 'id'>) => {
     const newItem = {
@@ -70,10 +80,12 @@ export const useSaleNote = () => {
 
   return {
     items,
+    businessName,
     total,
     addItem,
     updateItem,
     removeItem,
+    setBusinessName,
     isHydrated,
     clearNote
   };

@@ -12,7 +12,7 @@ import { SaleNoteTicket } from "./components/sale-note-ticket";
 import { SaleNoteActions } from "./components/sale-note-actions";
 
 export default function SaleNote() {
-    const { items, total, addItem, updateItem, removeItem, isHydrated, clearNote } = useSaleNote();
+    const { items, total, addItem, updateItem, removeItem, isHydrated, clearNote, businessName, setBusinessName } = useSaleNote();
     const [client, setClient] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,6 +74,8 @@ export default function SaleNote() {
 
             <main className="flex-1 p-4 md:p-8 flex flex-col items-center">
                 <SaleNoteTicket
+                    businessName={businessName}
+                    setBusinessName={setBusinessName}
                     client={client}
                     setClient={setClient}
                     date={date}

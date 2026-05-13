@@ -1,11 +1,14 @@
 "use client";
 
-import { Box } from "lucide-react";
-import { Edit2, Trash2 } from "lucide-react";
+import { Box, Edit2, Trash2, Check, X } from "lucide-react";
 import { SaleItem } from "../types";
 import Link from "next/link";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 interface SaleNoteTicketProps {
+    businessName: string;
+    setBusinessName: (val: string) => void;
     client: string;
     setClient: (val: string) => void;
     date: string;
@@ -17,6 +20,8 @@ interface SaleNoteTicketProps {
 }
 
 export function SaleNoteTicket({
+    businessName,
+    setBusinessName,
     client,
     setClient,
     date,
@@ -26,6 +31,19 @@ export function SaleNoteTicket({
     onEditItem,
     onRemoveItem,
 }: SaleNoteTicketProps) {
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [tempName, setTempName] = useState(businessName);
+
+    const handleSaveName = () => {
+        setBusinessName(tempName || "BUSINESS TOOLBOX");
+        setIsEditingName(false);
+    };
+
+    const handleCancelName = () => {
+        setTempName(businessName);
+        setIsEditingName(false);
+    };
+
     return (
         <div className="w-full max-w-2xl bg-white border border-slate-200 shadow-sm rounded-md p-6 md:p-10 tansition-all print: border-none print:shadow-none">
 
@@ -33,11 +51,45 @@ export function SaleNoteTicket({
             <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
 
                 <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                        <Box className="h-5 w-5 text-slate-950" />
-                        <h1 className="text-xl font-bold tracking-tight text-slate-950 uppercase">
-                            BUSINESS TOOLBOX
-                        </h1>
+                    <div className="flex items-center gap-2 group relative">
+
+                        {isEditingName ? (
+                            <div className="flex items-center gap-1">
+                                <input
+                                    type="text"
+                                    value={tempName}
+                                    onChange={(e) => setTempName(e.target.value.toUpperCase())}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") handleSaveName();
+                                        if (e.key === "Escape") handleCancelName();
+                                    }}
+                                    className="text-xl font-bold tracking-tight text-slate-950 uppercase border-b-2 border-slate-950 outline-none w-full max-w-[250px]"
+                                    autoFocus
+                                />
+                                <Button onClick={handleSaveName} className="p-1 hover:bg-slate-100 rounded text-green-600">
+                                    <Check className="h-4 w-4" />
+                                </Button>
+                                <Button onClick={handleCancelName} className="p-1 hover:bg-slate-100 rounded text-red-600">
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <h1 className="text-xl font-bold tracking-tight text-slate-950 uppercase">
+                                    {businessName}
+                                </h1>
+                                <Button
+                                    onClick={() => {
+                                        setTempName(businessName);
+                                        setIsEditingName(true);
+                                    }}
+                                    variant={"secondary"}
+                                    title="Editar nombre del negocio"
+                                >
+                                    <Edit2 className="h-3.5 w-3.5" />
+                                </Button>
+                            </div>
+                        )}
                     </div>
                     <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">
                         Nota de Venta / Comprobante

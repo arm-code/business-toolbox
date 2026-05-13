@@ -16,7 +16,7 @@ const footerLinks = {
         { href: "#", label: "API" },
     ],
     company: [
-        { href: "#", label: "Acerca de" },
+        { href: "https://www.arm-solutions.com.mx/", label: "Acerca de" },
         { href: "#", label: "Contacto" },
         { href: "#", label: "Privacidad" },
         { href: "#", label: "Términos" },
@@ -37,7 +37,7 @@ export function Footer() {
                             <span className="text-xl font-semibold">Business Toolbox</span>
                         </Link>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                            Desarrollado por ARM Solutions
+                            Desarrollado por <Link className="underline text-primary" href="https://www.arm-solutions.com.mx/">ARM Solutions</Link>
                         </p>
                         <p className="text-sm text-muted-foreground leading-relaxed">
                             Herramientas simples y asequibles diseñadas para pequeños negocios, tiendas locales y emprendedores.

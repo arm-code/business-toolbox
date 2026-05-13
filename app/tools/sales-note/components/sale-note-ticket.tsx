@@ -85,6 +85,7 @@ export function SaleNoteTicket({
                                     }}
                                     variant={"secondary"}
                                     title="Editar nombre del negocio"
+                                    className="print:hidden"
                                 >
                                     <Edit2 className="h-3.5 w-3.5" />
                                 </Button>

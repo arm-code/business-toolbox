@@ -3,6 +3,7 @@
 import { Box } from "lucide-react";
 import { Edit2, Trash2 } from "lucide-react";
 import { SaleItem } from "../types";
+import Link from "next/link";
 
 interface SaleNoteTicketProps {
     client: string;
@@ -161,8 +162,10 @@ export function SaleNoteTicket({
             </div>
 
             <div className="mt-12 text-center text-[10px] text-muted-foreground border-t pt-4">
-                Gracias por su preferencia • Generado por business-toolbox
+                Gracias por su preferencia • Generado por business-toolbox, una herramienta creada por <Link href="https://www.arm-solutions.com.mx/">ARM Solutions</Link>. Puedes hacer uso de esta herramienta de forma gratuita en cualquier momento, visítanos en:
+                <Link href="https://www.arm-solutions.com.mx/">bt.arm-solutions.com.mx</Link>
             </div>
+
         </div>
     );
 }

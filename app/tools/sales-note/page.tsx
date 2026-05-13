@@ -62,9 +62,9 @@ export default function SaleNote() {
         <div className="min-h-screen bg-slate-50 flex flex-col pb-24 md:pb-8">
             {/* Navigation - Hidden on Print */}
             <header className="print:hidden px-4 lg:px-6 h-16 flex items-center border-b bg-card sticky top-0 z-50">
-                <NextLink className="flex items-center justify-center text-sm font-medium" href="/catalog">
+                <NextLink className="flex items-center justify-center text-sm font-medium" href="/tools">
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Catálogo
+                    Herramientas
                 </NextLink>
                 <div className="ml-auto flex items-center gap-2">
                     <Receipt className="h-5 w-5 text-primary" />

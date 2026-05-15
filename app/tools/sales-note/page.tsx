@@ -12,7 +12,7 @@ import { SaleNoteTicket } from "./components/sale-note-ticket";
 import { SaleNoteActions } from "./components/sale-note-actions";
 
 export default function SaleNote() {
-    const { items, total, addItem, updateItem, removeItem, isHydrated, clearNote } = useSaleNote();
+    const { items, total, addItem, updateItem, removeItem, isHydrated, clearNote, businessName, setBusinessName } = useSaleNote();
     const [client, setClient] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,9 +62,9 @@ export default function SaleNote() {
         <div className="min-h-screen bg-slate-50 flex flex-col pb-24 md:pb-8">
             {/* Navigation - Hidden on Print */}
             <header className="print:hidden px-4 lg:px-6 h-16 flex items-center border-b bg-card sticky top-0 z-50">
-                <NextLink className="flex items-center justify-center text-sm font-medium" href="/catalog">
+                <NextLink className="flex items-center justify-center text-sm font-medium" href="/tools">
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Catálogo
+                    Herramientas
                 </NextLink>
                 <div className="ml-auto flex items-center gap-2">
                     <Receipt className="h-5 w-5 text-primary" />
@@ -74,6 +74,8 @@ export default function SaleNote() {
 
             <main className="flex-1 p-4 md:p-8 flex flex-col items-center">
                 <SaleNoteTicket
+                    businessName={businessName}
+                    setBusinessName={setBusinessName}
                     client={client}
                     setClient={setClient}
                     date={date}

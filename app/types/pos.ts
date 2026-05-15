@@ -178,16 +178,38 @@ export interface ShiftExpensesReport {
     };
 }
 
+export interface ExpenseCategory {
+  id: string; // GUID
+  name: string;
+  icon: string; // Emoji o nombre de icono
+}
+
+export interface Expense {
+  id: string; // GUID
+  description: string;
+  amount: number;
+  date: string; // ISO Date string
+  categoryId: string;
+  category?: ExpenseCategory;
+}
+
+export interface CreateExpenseDto {
+  description: string;
+  amount: number;
+  date: string;
+  categoryId: string;
+}
+
 export interface ApiError {
-    statusCode: number;
-    message: string | string[];
-    path: string;
-    timestamp: string;
+  statusCode: number;
+  message: string | string[];
+  path: string;
+  timestamp: string;
 }
 
 export interface ApiResponse<T> {
-    success: boolean;
-    data: T;
-    message?: string;
-    error?: ApiError;
+  success: boolean;
+  data: T;
+  message?: string;
+  error?: ApiError;
 }

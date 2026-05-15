@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Mail, Lock, Loader2, ArrowRight, User, Phone, MapPin } from "lucide-react";
 import { apiFetch } from "../../lib/api";
+import { supabase } from "../../lib/supabase";
 import Toast, { ToastType } from "../../components/Toast";
 
 export default function RegisterPage() {
@@ -31,12 +32,23 @@ export default function RegisterPage() {
         e.preventDefault();
         try {
             setLoading(true);
-            await apiFetch("/auth/register", {
-                method: 'POST',
-                body: JSON.stringify(formData)
+            const { data, error } = await supabase.auth.signUp({
+                email: formData.email,
+                password: formData.password,
+                options: {
+                    data: {
+                        firstName: formData.firstName,
+                        lastName: formData.lastName,
+                        phone: formData.phone,
+                        address: formData.address,
+                        role: 'USER' // Default role
+                    }
+                }
             });
 
-            showToast("Cuenta creada con éxito. Ahora puedes iniciar sesión.");
+            if (error) throw error;
+
+            showToast("Cuenta creada con éxito. Por favor verifica tu correo si es necesario.");
             setTimeout(() => router.push("/login"), 1500);
         } catch (error: any) {
             showToast(error.message || "Error al registrarse", 'error');

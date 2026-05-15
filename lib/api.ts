@@ -27,9 +27,14 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
         throw new Error('Sesión expirada. Por favor, inicia sesión de nuevo.');
     }
 
-    const result = await response.json() as ApiResponse<T>;
+    const result = await response.json();
 
-    if (!response.ok || !result.success) {
+    // If it's a direct array or doesn't have the success wrapper, but response is OK
+    if (response.ok && (result.success === undefined || result.success === true)) {
+        return result.data !== undefined ? result.data : result;
+    }
+
+    if (!response.ok || result.success === false) {
         // Extract message from standardized error object
         const errorMessage = result.error?.message
             ? (Array.isArray(result.error.message) ? result.error.message[0] : result.error.message)

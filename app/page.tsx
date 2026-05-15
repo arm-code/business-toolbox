@@ -22,6 +22,7 @@ import { ToolCard } from "@/components/tool-card"
 import { Footer } from "@/components/footer"
 
 const tools = [
+/*
   {
     title: "Punto de Venta",
     description: "Registra ventas rápidamente, gestiona productos, imprime tickets y lleva el control de tu flujo de caja diario.",
@@ -30,6 +31,7 @@ const tools = [
     badge: "Free" as const,
     featured: true,
   },
+*/
   {
     title: "Generador de Notas de Venta",
     description: "Crea notas de venta rápidas y facturas desde tu teléfono o computadora en segundos.",

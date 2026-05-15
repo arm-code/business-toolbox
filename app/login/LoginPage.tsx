@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Mail, Lock, Loader2, ArrowRight, Sparkles } from "lucide-react";
 import { apiFetch } from "../../lib/api";
+import { supabase } from "../../lib/supabase";
 import { AuthResponse } from "../types/pos";
 import Toast, { ToastType } from "../../components/Toast";
 
@@ -33,16 +34,31 @@ export default function LoginPage() {
         e.preventDefault();
         try {
             setLoading(true);
-            const data = await apiFetch<AuthResponse>("/auth/login", {
-                method: 'POST',
-                body: JSON.stringify({ email, password })
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
             });
 
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            if (error) throw error;
 
-            showToast("¡Bienvenido de nuevo!");
-            setTimeout(() => router.push("/catalog"), 1000);
+            if (data.session && data.user) {
+                const userMetadata = data.user.user_metadata;
+                const mappedUser: AuthResponse['user'] = {
+                    id: data.user.id,
+                    email: data.user.email || '',
+                    firstName: userMetadata.firstName || 'Usuario',
+                    lastName: userMetadata.lastName || '',
+                    phone: userMetadata.phone || '',
+                    address: userMetadata.address || '',
+                    role: userMetadata.role || 'USER'
+                };
+
+                localStorage.setItem('token', data.session.access_token);
+                localStorage.setItem('user', JSON.stringify(mappedUser));
+
+                showToast("¡Bienvenido de nuevo!");
+                setTimeout(() => router.push("/tools"), 1000); // Redirect to tools instead of catalog if catalog doesn't exist
+            }
         } catch (error: any) {
             showToast(error.message || "Error al iniciar sesión", 'error');
         } finally {
@@ -51,22 +67,7 @@ export default function LoginPage() {
     };
 
     const handleDemo = async () => {
-        try {
-            setDemoLoading(true);
-            const data = await apiFetch<AuthResponse>("/auth/demo-guest", {
-                method: 'POST'
-            });
-
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-
-            showToast("Acceso Demo concedido");
-            setTimeout(() => router.push("/catalog"), 1000);
-        } catch (error: any) {
-            showToast(error.message || "Error al iniciar demo", 'error');
-        } finally {
-            setDemoLoading(false);
-        }
+        showToast("El acceso demo está temporalmente deshabilitado durante la migración.", 'info');
     };
 
     return (

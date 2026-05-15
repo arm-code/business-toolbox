@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 
 const allTools = [
+/*
     {
         title: "Punto de Venta",
         description: "Registra ventas rápidamente, gestiona productos, imprime tickets y lleva el control de tu flujo de caja diario. La herramienta más completa para tus ventas diarias.",
@@ -21,6 +22,7 @@ const allTools = [
         badge: "Free" as const,
         featured: true,
     },
+*/
     {
         title: "Generador de Notas de Venta",
         description: "Crea notas de venta rápidas y facturas desde tu teléfono o computadora. Perfecta para transacciones sobre la marcha.",

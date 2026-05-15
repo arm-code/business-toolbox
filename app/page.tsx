@@ -58,7 +58,7 @@ const tools = [
     description: "Registra tus gastos diarios de forma sencilla y mantén el control de los gastos de tu negocio.",
     icon: Wallet,
     href: "/tools/expenses",
-    badge: "Premium" as const,
+    badge: "Free" as const,
   },
 ]
 

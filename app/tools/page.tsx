@@ -49,7 +49,7 @@ const allTools = [
         description: "Registra tus gastos diarios por categoría. Conoce exactamente a dónde va tu dinero e identifica oportunidades de ahorro.",
         icon: Wallet,
         href: "/tools/expenses",
-        badge: "Premium" as const,
+        badge: "Free" as const,
     },
     {
         title: "Reportes de Ventas",

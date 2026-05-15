@@ -121,14 +121,8 @@ export interface Shift {
     updatedAt?: string;
 }
 
-export interface Expense {
-    id: string;
-    description: string;
-    amount: number;
-    category: string;
-    shiftId: string;
-    createdAt: string;
-}
+// Removed legacy Expense interface with string category. Use the later definition with ExpenseCategory.
+
 
 export interface Supplier {
     id: string;

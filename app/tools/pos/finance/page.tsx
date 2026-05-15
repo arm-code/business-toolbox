@@ -236,7 +236,7 @@ export default function FinancePage() {
                                                 <div>
                                                     <p className="text-sm font-black uppercase leading-none">{expense.description}</p>
                                                     <p className="text-[10px] text-muted-foreground font-bold mt-1 uppercase">
-                                                        {expense.category} • {new Date(expense.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        {(typeof expense.category === 'object' ? expense.category?.name : expense.category) || 'Sin categoría'} • {new Date((expense as any).createdAt || expense.date || new Date()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                     </p>
                                                 </div>
                                             </div>

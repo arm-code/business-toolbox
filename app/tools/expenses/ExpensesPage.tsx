@@ -104,10 +104,13 @@ export default function ExpensesPage() {
 
     const totalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0);
 
-    const filteredExpenses = expenses.filter(e => 
-        e.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        e.category?.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredExpenses = expenses.filter(e => {
+        const term = searchTerm.toLowerCase();
+        const descriptionMatch = e.description.toLowerCase().includes(term);
+        const categoryName = e.category?.name ?? '';
+        const categoryMatch = categoryName.toLowerCase().includes(term);
+        return descriptionMatch || categoryMatch;
+    });
 
     return (
         <div className="flex min-h-screen flex-col bg-slate-50">
